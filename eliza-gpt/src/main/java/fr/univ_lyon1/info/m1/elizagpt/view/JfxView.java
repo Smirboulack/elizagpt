@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Random;
+import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -74,7 +75,13 @@ public class JfxView {
         label.setStyle(USER_STYLE);
         hBox.setAlignment(Pos.BASELINE_LEFT);
         dialog.getChildren().add(hBox);
-        // TODO: a click on this hbox should delete the message.
+        // Ajoute un gestionnaire d'événements pour gérer le clic sur la HBox
+        hBox.setOnMouseClicked(event -> {
+            // Supprime la HBox (le message) lors du clic
+            dialog.getChildren().remove(hBox);
+        });
+
+
     }
     
     private void sendMessage(final String text) {
@@ -126,6 +133,16 @@ public class JfxView {
                 "Êtes-vous sûr que ",
             });
             replyToUser(startQuestion + processor.firstToSecondPerson(matcher.group(1)) + " ?");
+            return;
+        }
+        pattern = Pattern.compile(".*\\?$", Pattern.CASE_INSENSITIVE);
+        matcher = pattern.matcher(normalizedText);
+        if (matcher.matches()) {
+            final String startQuestion = processor.pickRandom(new String[] {
+                    "Je vous renvoie la question.",
+                    "Ici, c'est moi qui pose les questions."
+            });
+            replyToUser(startQuestion);
             return;
         }
         // Nothing clever to say, answer randomly
@@ -198,21 +215,35 @@ public class JfxView {
 
     private void searchText(final TextField text) {
         String currentSearchText = text.getText();
-        if (currentSearchText == null) {
+        if (currentSearchText == null || currentSearchText.isEmpty()) {
             searchTextLabel.setText("No active search");
         } else {
             searchTextLabel.setText("Searching for: " + currentSearchText);
         }
+
         List<HBox> toDelete = new ArrayList<>();
+        Pattern pattern = null;
+
+            try {
+                pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
+            } catch (PatternSyntaxException e) {
+                // Handle invalid regular expression
+                e.printStackTrace();
+                return;
+            }
+
         for (Node hBox : dialog.getChildren()) {
             for (Node label : ((HBox) hBox).getChildren()) {
-                String t = ((Label) label).getText();
-                if (!t.contains(text.getText())) {
-                    // Can delete it right now, we're iterating over the list.
+                String labelText = ((Label) label).getText();
+                boolean matches =
+                        (pattern.matcher(labelText).find());
+                if (!matches) {
                     toDelete.add((HBox) hBox);
+                    break;  // No need to check other labels within this HBox
                 }
             }
         }
+
         dialog.getChildren().removeAll(toDelete);
         text.setText("");
     }

@@ -19,7 +19,6 @@ public class App extends Application {
         // new JfxView(new Stage(), 400, 400);
     }
 
-
     /**
      * A main method in case the user launches the application using
      * App as the main class.
