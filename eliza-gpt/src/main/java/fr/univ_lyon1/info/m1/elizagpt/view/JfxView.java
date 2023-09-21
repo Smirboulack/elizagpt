@@ -32,10 +32,8 @@ public class JfxView {
     private final Random random = new Random();
 
     /**
-     * Create the main view of the application.
+     * Main class of the View (GUI) of the application.
      */
-    // TODO: style error in the following line. Check that checkstyle finds it, and
-    // then fix it.
     public JfxView(final Stage stage, final int width, final int height) {
         stage.setTitle("Eliza GPT");
 
@@ -169,7 +167,7 @@ public class JfxView {
     /**
      * Extract the name of the user from the dialog.
      * TODO: this totally breaks the MVC pattern, never, ever, EVER do that.
-     * 
+     *
      * @return
      */
     private String getName() {
