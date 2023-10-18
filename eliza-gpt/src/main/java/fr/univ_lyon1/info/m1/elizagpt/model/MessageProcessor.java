@@ -9,7 +9,6 @@ import java.util.regex.PatternSyntaxException;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
 /**
@@ -99,7 +98,13 @@ public class MessageProcessor {
         return array[random.nextInt(array.length)];
     }
 
-    public List<HBox> filterMessagesByPattern(String patternText) {
+    /**
+     * Pick a random reply to a message.
+     * 
+     * @param patternText The pattern to match.
+     * @return The reply.
+     */
+    public List<HBox> filterMessagesByPattern(final String patternText) {
         Pattern pattern;
         List<HBox> filteredMessages = new ArrayList<>();
 

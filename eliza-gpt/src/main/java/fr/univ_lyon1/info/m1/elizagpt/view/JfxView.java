@@ -164,27 +164,55 @@ public class JfxView {
         }
     }
 
+    /**
+     * Get the search text field.
+     * 
+     * @return the search text field
+     */
     public TextField getSearchText() {
         return searchText;
     }
 
-    public void updateMessages(List<HBox> messages) {
+    /**
+     * Update the search label with the given text.
+     * 
+     * @param messages the text to update the search label with
+     */
+    public void updateMessages(final List<HBox> messages) {
         dialog.getChildren().clear();
         dialog.getChildren().addAll(messages);
     }
 
-    public void updateSearchLabel(String text) {
+    /**
+     * Update the search label with the given text.
+     * 
+     * @param text the text to update the search label with
+     */
+    public void updateSearchLabel(final String text) {
         searchTextLabel.setText(text);
     }
 
+    /**
+     * Extract the name of the user from the dialog.
+     *
+     * @return the name of the user, or null if not found
+     */
     public String getInputText() {
         return text.getText();
     }
 
+    /**
+     * Clear the search text field.
+     *
+     */
     public void clearSearchText() {
         searchText.setText("");
     }
 
+    /**
+     * Clear the input text field.
+     *
+     */
     public void clearInputText() {
         text.setText("");
     }
@@ -193,7 +221,7 @@ public class JfxView {
      * Extract the name of the user from the dialog.
      * TODO: this totally breaks the MVC pattern, never, ever, EVER do that.
      *
-     * @return
+     * @return the name of the user, or null if not found
      */
     private String getName() {
         for (Node hBox : dialog.getChildren()) {
