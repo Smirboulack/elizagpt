@@ -1,16 +1,27 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 
 /**
  * Logic to process a message (and probably reply to it).
  */
 public class MessageProcessor {
+    private List<HBox> messages;
     private final Random random = new Random();
+
     /**
      * Normlize the text: remove extra spaces, add a final dot if missing.
+     * 
      * @param text
      * @return normalized text.
      */
@@ -87,4 +98,29 @@ public class MessageProcessor {
     public <T> T pickRandom(final T[] array) {
         return array[random.nextInt(array.length)];
     }
+
+    public List<HBox> filterMessagesByPattern(String patternText) {
+        Pattern pattern;
+        List<HBox> filteredMessages = new ArrayList<>();
+
+        try {
+            pattern = Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
+        } catch (PatternSyntaxException e) {
+            e.printStackTrace();
+            return messages; // Return all messages if pattern is invalid
+        }
+
+        for (HBox hBox : messages) {
+            for (Node label : hBox.getChildren()) {
+                String labelText = ((Label) label).getText();
+                if (pattern.matcher(labelText).find()) {
+                    filteredMessages.add(hBox);
+                    break;
+                }
+            }
+        }
+
+        return filteredMessages;
+    }
+
 }

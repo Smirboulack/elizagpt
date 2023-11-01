@@ -64,8 +64,8 @@ public class JfxView {
     static final String BASE_STYLE = "-fx-padding: 8px; "
             + "-fx-margin: 5px; "
             + "-fx-background-radius: 5px;";
-    static final String  ELIZA_STYLE = "-fx-background-color: #A0E0A0; " + BASE_STYLE;
-    static final String USER_STYLE  = "-fx-background-color: #A0A0E0; " + BASE_STYLE;
+    static final String ELIZA_STYLE = "-fx-background-color: #A0E0A0; " + BASE_STYLE;
+    static final String USER_STYLE = "-fx-background-color: #A0A0E0; " + BASE_STYLE;
 
     private void replyToUser(final String text) {
         HBox hBox = new HBox();
@@ -162,6 +162,31 @@ public class JfxView {
         } else {
             replyToUser("Qu'est-ce qui vous fait dire cela ?");
         }
+    }
+
+    public TextField getSearchText() {
+        return searchText;
+    }
+
+    public void updateMessages(List<HBox> messages) {
+        dialog.getChildren().clear();
+        dialog.getChildren().addAll(messages);
+    }
+
+    public void updateSearchLabel(String text) {
+        searchTextLabel.setText(text);
+    }
+
+    public String getInputText() {
+        return text.getText();
+    }
+
+    public void clearSearchText() {
+        searchText.setText("");
+    }
+
+    public void clearInputText() {
+        text.setText("");
     }
 
     /**
