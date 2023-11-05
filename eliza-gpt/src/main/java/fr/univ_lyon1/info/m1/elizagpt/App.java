@@ -1,5 +1,8 @@
 package fr.univ_lyon1.info.m1.elizagpt;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
@@ -17,10 +20,14 @@ public class App extends Application {
     @Override
     public void start(final Stage stage) throws Exception {
         JfxView view1 = new JfxView(stage, 600, 600);
+        JfxView view2 = new JfxView(new Stage(), 400, 400);
         MessageProcessor model = new MessageProcessor();
-        MessageController controller = new MessageController(model, view1);
+        List<JfxView> view = new ArrayList<JfxView>();
+        view.add(view1);
+        view.add(view2);
+        MessageController controller = new MessageController(model, view);
         // Second view (uncomment to activate)
-        //JfxView view2 = new JfxView(new Stage(), 400, 400);
+        
     }
 
     /**

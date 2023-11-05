@@ -1,10 +1,7 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,8 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
 
@@ -147,6 +142,15 @@ public class JfxView {
     public void updateSearchLabel(final String text) {
         searchTextLabel.setText(text);
     }
+
+    /**
+     * Return the search text label.
+     * @return
+     */
+    Label getSearchTextLabel() {
+        return searchTextLabel;
+    }
+
     /*
      * return the text of the search text field.
      */
@@ -168,6 +172,25 @@ public class JfxView {
     }
 
     /**
+     * Return the dialog.
+     * @return
+     */
+    public VBox getDialog() {
+        return dialog;
+    }
+
+    /**
+     * Display the search results in the dialog.
+     */
+    public void displaySearchResults(final List<HBox> searchResults, final String searchText) {
+        searchTextLabel.setText(searchResults.isEmpty() 
+        ? 
+        "No results found for: " + searchText 
+        : "Results for: " + searchText);
+        dialog.getChildren().setAll(searchResults);
+    }
+
+    /**
      * Extract the name of the user from the dialog.
      * TODO: this totally breaks the MVC pattern, never, ever, EVER do that.
      *
@@ -180,12 +203,12 @@ public class JfxView {
         secondLine.setAlignment(Pos.BASELINE_LEFT);
         searchText = new TextField();
         searchText.setOnAction(e -> {
-            searchText(searchText);
+            controller.performSearch(searchText.getText());
         });
         firstLine.getChildren().add(searchText);
         final Button send = new Button("Search");
         send.setOnAction(e -> {
-            searchText(searchText);
+            controller.performSearch(searchText.getText());
         });
         searchTextLabel = new Label();
         final Button undo = new Button("Undo search");
@@ -198,7 +221,7 @@ public class JfxView {
         return input;
     }
 
-    private void searchText(final TextField text) {
+    /* private void searchText(final TextField text) {
         String currentSearchText = text.getText();
         if (currentSearchText == null || currentSearchText.isEmpty()) {
             searchTextLabel.setText("No active search");
@@ -230,7 +253,7 @@ public class JfxView {
 
         dialog.getChildren().removeAll(toDelete);
         text.setText("");
-    }
+    } */
 
     private Pane createInputWidget() {
         final Pane input = new HBox();
