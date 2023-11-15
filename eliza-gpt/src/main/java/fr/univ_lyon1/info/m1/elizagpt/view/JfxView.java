@@ -22,7 +22,9 @@ public class JfxView {
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
-    private MessageController controller;
+    private Button search = null;
+    private Button undo = null;
+    private Button send = null;
 
     /**
      * Main class of the View (GUI) of the application.
@@ -56,9 +58,6 @@ public class JfxView {
      * Set the controller of the view.
      * @param controller
      */
-    public void setController(final MessageController controller) {
-        this.controller = controller;
-    }
 
     static final String BASE_STYLE = "-fx-padding: 8px; "
             + "-fx-margin: 5px; "
@@ -70,10 +69,6 @@ public class JfxView {
      * Send a message to Eliza.
      * @param text
      */
-    private void sendMessage(final String text) {
-        controller.processUserInput(text);
-        this.text.setText("");
-    }
 
     /**
      * Display message from user.
@@ -200,20 +195,14 @@ public class JfxView {
         firstLine.setAlignment(Pos.BASELINE_LEFT);
         secondLine.setAlignment(Pos.BASELINE_LEFT);
         searchText = new TextField();
-        searchText.setOnAction(e -> {
-            controller.performSearch(searchText.getText());
-        });
         firstLine.getChildren().add(searchText);
-        final Button send = new Button("Search");
-        send.setOnAction(e -> {
-            controller.performSearch(searchText.getText());
-        });
+        search = new Button("Search");
         searchTextLabel = new Label();
-        final Button undo = new Button("Undo search");
+        undo = new Button("Undo search");
         undo.setOnAction(e -> {
             throw new UnsupportedOperationException("TODO: implement undo for search");
         });
-        secondLine.getChildren().addAll(send, searchTextLabel, undo);
+        secondLine.getChildren().addAll(search, searchTextLabel, undo);
         final VBox input = new VBox();
         input.getChildren().addAll(firstLine, secondLine);
         return input;
@@ -256,16 +245,24 @@ public class JfxView {
     private Pane createInputWidget() {
         final Pane input = new HBox();
         text = new TextField();
-        text.setOnAction(e -> {
-            sendMessage(text.getText());
-            text.setText("");
-        });
-        final Button send = new Button("Send");
-        send.setOnAction(e -> {
-            sendMessage(text.getText());
-            text.setText("");
-        });
+        send = new Button("Send");
         input.getChildren().addAll(text, send);
         return input;
+    }
+
+    public Button getSearch() {
+        return search;
+    }
+    public Button getUndo() {
+        return undo;
+    }
+    public TextField getText() {
+        return text;
+    }
+    public void setText(TextField text) {
+        this.text = text;
+    }
+    public Button getSend() {
+        return send;
     }
 }

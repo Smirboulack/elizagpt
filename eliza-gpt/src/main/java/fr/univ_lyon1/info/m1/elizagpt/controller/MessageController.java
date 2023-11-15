@@ -32,16 +32,22 @@ public class MessageController {
     public MessageController(final MessageProcessor model, final List<JfxView> view) {
         this.model = model;
         this.views = view;
-        for (JfxView v : views) {
-            v.setController(this);
-        }
         setupListeners();
     }
 
     private void setupListeners() {
-        // view.getSearchText().setOnAction(e -> handleSearch());
         for (JfxView v : views) {
-            v.getSearchText().setOnAction(e -> handleSearch());
+            v.getSearch().setOnAction(e -> {
+                performSearch(v.getSearchText().getText());
+            });
+            v.getText().setOnAction(e -> {
+                processUserInput(v.getText().getText());
+                v.getText().setText("");
+            });
+            v.getSend().setOnAction(e -> {
+                processUserInput(v.getText().getText());
+                v.getText().setText("");
+            });
         }
     }
 
@@ -79,11 +85,7 @@ public class MessageController {
             v.displayUserMessage(input);
             v.displayElizaMessage(response);
         }
-        /*
-         * view.displayUserMessage(input);
-         * System.out.println(response);
-         * view.displayElizaMessage(response);
-         */
+
         System.out.println("l'affichage est fini");
     }
 
