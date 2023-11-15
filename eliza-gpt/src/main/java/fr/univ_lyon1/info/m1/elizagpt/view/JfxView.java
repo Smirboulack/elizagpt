@@ -12,8 +12,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
-
 /**
  * Main class of the View (GUI) of the application.
  */
@@ -64,11 +62,6 @@ public class JfxView {
             + "-fx-background-radius: 5px;";
     static final String USER_STYLE = "-fx-background-color: #A0E0A0; " + BASE_STYLE;
     static final String ELIZA_STYLE = "-fx-background-color: #A0A0E0; " + BASE_STYLE;
-
-    /**
-     * Send a message to Eliza.
-     * @param text
-     */
 
     /**
      * Display message from user.
@@ -258,9 +251,6 @@ public class JfxView {
     }
     public TextField getText() {
         return text;
-    }
-    public void setText(TextField text) {
-        this.text = text;
     }
     public Button getSend() {
         return send;
