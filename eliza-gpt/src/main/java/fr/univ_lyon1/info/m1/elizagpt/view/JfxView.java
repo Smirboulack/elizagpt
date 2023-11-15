@@ -117,8 +117,6 @@ public class JfxView {
         hBox.setAlignment(Pos.BASELINE_LEFT);
         hBox.getChildren().add(label);
         hBox.setOnMouseClicked(e -> dialog.getChildren().remove(hBox));
-        // Add any additional styling or behavior
-        System.out.println("createElizaMessageHBox");
         return hBox;
     }
 
@@ -147,7 +145,7 @@ public class JfxView {
      * Return the search text label.
      * @return
      */
-    Label getSearchTextLabel() {
+    public Label getSearchTextLabel() {
         return searchTextLabel;
     }
 
