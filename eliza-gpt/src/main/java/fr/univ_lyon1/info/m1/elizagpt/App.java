@@ -26,10 +26,7 @@ public class App extends Application {
         List<JfxView> view = new ArrayList<JfxView>();
         view.add(view1);
         view.add(view2);
-        //view.add(view3);
         MessageController controller = new MessageController(model, view);
-        // Second view (uncomment to activate)
-        
     }
 
     /**

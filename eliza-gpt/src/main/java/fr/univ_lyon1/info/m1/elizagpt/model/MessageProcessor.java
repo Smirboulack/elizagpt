@@ -1,21 +1,14 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
 
 /**
  * Logic to process a message (and probably reply to it).
  */
 public class MessageProcessor {
-    private List<HBox> messages;
+    //private List<HBox> messages;
     private String username;
     private final Random random = new Random();
 
@@ -99,10 +92,7 @@ public class MessageProcessor {
         return array[random.nextInt(array.length)];
     }
 
-    /**
-     * find a random element in the array that matches the pattern.
-     */
-    public List<HBox> filterMessagesByPattern(final String patternText) {
+    /* public List<HBox> filterMessagesByPattern(final String patternText) {
         Pattern pattern;
         List<HBox> filteredMessages = new ArrayList<>();
 
@@ -124,7 +114,7 @@ public class MessageProcessor {
         }
 
         return filteredMessages;
-    }
+    } */
 
     /**
      * return the username.

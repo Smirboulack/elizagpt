@@ -35,31 +35,7 @@ public class MessageController {
         for (JfxView v : views) {
             v.setController(this);
         }
-        setupListeners();
-    }
-
-    private void setupListeners() {
-        // view.getSearchText().setOnAction(e -> handleSearch());
-        for (JfxView v : views) {
-            v.getSearchText().setOnAction(e -> handleSearch());
-        }
-    }
-
-    private void handleSearch() {
-        /* String searchPattern = view.getSearchText().toString(); */
-        for (JfxView v : views) {
-            String searchPattern = v.getSearchText().toString();
-            List<HBox> filteredMessages = model.filterMessagesByPattern(searchPattern);
-            v.updateMessages(filteredMessages);
-            v.updateSearchLabel("Searching for: " + searchPattern);
-            v.clearSearchText();
-        }
-        /*
-         * List<HBox> filteredMessages = model.filterMessagesByPattern(searchPattern);
-         * view.updateMessages(filteredMessages);
-         * view.updateSearchLabel("Searching for: " + searchPattern);
-         * view.clearSearchText();
-         */
+        // setupListeners();
     }
 
     /**
@@ -170,7 +146,7 @@ public class MessageController {
                 view.getSearchTextLabel().setText("Searching for: " + currentSearchText);
             }
         }
-    
+
         Pattern pattern = null;
         try {
             pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
@@ -179,7 +155,7 @@ public class MessageController {
             e.printStackTrace();
             return;
         }
-    
+
         for (JfxView view : views) {
             List<HBox> toDelete = new ArrayList<>();
             for (Node hBox : view.getDialog().getChildren()) {
@@ -194,37 +170,36 @@ public class MessageController {
             }
             view.getDialog().getChildren().removeAll(toDelete);
         }
-        text.setText("");
+        // text.setText("");
     }
-    
-    
+
     /**
      * Perform a search.
      * 
      * @param searchText
      */
     public void performSearch(final String searchText) {
-
+        // On sauvegarde l'état actuel de la vue
+        for (JfxView jfview2 : views) {
+            jfview2.saveOriginalState();
+        }
         for (JfxView jfxView : views) {
+
             TextField textField = jfxView.getSearchText();
             textField.setText(searchText);
             searchText(textField, views);
         }
-
-        /* // Presuming 'views' is a list of JfxView objects
-        for (JfxView view : views) {
-            TextField textField = view.getSearchText();
-            textField.setText(searchText);
-    
-            List<HBox> searchResults = searchText(textField, view);
-            if (searchText == null || searchText.isEmpty()) {
-                view.displaySearchResults(Collections.emptyList(), "");
-            } else {
-                view.displaySearchResults(searchResults, searchText);
-            }
-        } */
     }
-    
+
+    /**
+     * Undo the search.
+     */
+    public void undoSearch() {
+        for (JfxView jfxView : views) {
+            jfxView.restoreOriginalState();
+        }
+    }
+
     /*
      * public void performSearch(final String searchText) {
      * // Compile the pattern once, outside of the loop

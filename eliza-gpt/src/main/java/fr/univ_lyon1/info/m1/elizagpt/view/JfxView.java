@@ -1,6 +1,9 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -22,6 +25,7 @@ public class JfxView {
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
+    private List<HBox> originalChildren;
     private MessageController controller;
 
     /**
@@ -54,6 +58,7 @@ public class JfxView {
 
     /**
      * Set the controller of the view.
+     * 
      * @param controller
      */
     public void setController(final MessageController controller) {
@@ -68,6 +73,7 @@ public class JfxView {
 
     /**
      * Send a message to Eliza.
+     * 
      * @param text
      */
     private void sendMessage(final String text) {
@@ -77,6 +83,7 @@ public class JfxView {
 
     /**
      * Display message from user.
+     * 
      * @param message
      */
     public void displayUserMessage(final String message) {
@@ -87,6 +94,7 @@ public class JfxView {
 
     /**
      * Display message from Eliza.
+     * 
      * @param message
      */
     public void displayElizaMessage(final String message) {
@@ -126,6 +134,7 @@ public class JfxView {
 
     /**
      * Update the messages displayed in the dialog.
+     * 
      * @param messages
      */
     public void updateMessages(final List<HBox> messages) {
@@ -135,6 +144,7 @@ public class JfxView {
 
     /**
      * Update the text of the search label.
+     * 
      * @param text
      */
     public void updateSearchLabel(final String text) {
@@ -143,6 +153,7 @@ public class JfxView {
 
     /**
      * Return the search text label.
+     * 
      * @return
      */
     public Label getSearchTextLabel() {
@@ -162,6 +173,7 @@ public class JfxView {
     public void clearSearchText() {
         searchText.setText("");
     }
+
     /**
      * clear the input text field.
      */
@@ -171,6 +183,7 @@ public class JfxView {
 
     /**
      * Return the dialog.
+     * 
      * @return
      */
     public VBox getDialog() {
@@ -181,10 +194,9 @@ public class JfxView {
      * Display the search results in the dialog.
      */
     public void displaySearchResults(final List<HBox> searchResults, final String searchText) {
-        searchTextLabel.setText(searchResults.isEmpty() 
-        ? 
-        "No results found for: " + searchText 
-        : "Results for: " + searchText);
+        searchTextLabel.setText(searchResults.isEmpty()
+                ? "No results found for: " + searchText
+                : "Results for: " + searchText);
         dialog.getChildren().setAll(searchResults);
     }
 
@@ -211,7 +223,8 @@ public class JfxView {
         searchTextLabel = new Label();
         final Button undo = new Button("Undo search");
         undo.setOnAction(e -> {
-            throw new UnsupportedOperationException("TODO: implement undo for search");
+            controller.undoSearch();
+            // throw new UnsupportedOperationException("TODO: implement undo for search");
         });
         secondLine.getChildren().addAll(send, searchTextLabel, undo);
         final VBox input = new VBox();
@@ -219,39 +232,73 @@ public class JfxView {
         return input;
     }
 
-    /* private void searchText(final TextField text) {
-        String currentSearchText = text.getText();
-        if (currentSearchText == null || currentSearchText.isEmpty()) {
-            searchTextLabel.setText("No active search");
-        } else {
-            searchTextLabel.setText("Searching for: " + currentSearchText);
-        }
+    /**
+     * Save the original state of the dialog.
+     */
+    public void saveOriginalState() {
+        this.originalChildren = new ArrayList<>(this.getDialog().getChildren().stream()
+                .filter(node -> node instanceof HBox)
+                .map(node -> (HBox) node)
+                .collect(Collectors.toList()));
 
-        List<HBox> toDelete = new ArrayList<>();
-        Pattern pattern = null;
-
-        try {
-            pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
-        } catch (PatternSyntaxException e) {
-            // Handle invalid regular expression
-            e.printStackTrace();
-            return;
-        }
-
-        for (Node hBox : dialog.getChildren()) {
-            for (Node label : ((HBox) hBox).getChildren()) {
-                String labelText = ((Label) label).getText();
-                boolean matches = (pattern.matcher(labelText).find());
-                if (!matches) {
-                    toDelete.add((HBox) hBox);
-                    break; // No need to check other labels within this HBox
-                }
+        //afficher en console le contenu de originalChildren
+        for (HBox hBox : originalChildren) {
+            for (Label label : hBox.getChildren().stream()
+                    .filter(node -> node instanceof Label)
+                    .map(node -> (Label) node)
+                    .collect(Collectors.toList())) {
+                System.out.println("saveOriginalState provenant de la fenetre :" 
+                + this.getDialog().getScene().getWindow().toString() + " : ");
+                System.out.println(label.getText());
             }
         }
+    }
 
-        dialog.getChildren().removeAll(toDelete);
-        text.setText("");
-    } */
+    /**
+     * Restore the original state of the dialog.
+     */
+    public void restoreOriginalState() {
+        if (this.originalChildren != null) {
+            this.getDialog().getChildren().clear();
+            this.getDialog().getChildren().addAll(this.originalChildren);
+        }
+    }
+
+    /*
+     * private void searchText(final TextField text) {
+     * String currentSearchText = text.getText();
+     * if (currentSearchText == null || currentSearchText.isEmpty()) {
+     * searchTextLabel.setText("No active search");
+     * } else {
+     * searchTextLabel.setText("Searching for: " + currentSearchText);
+     * }
+     * 
+     * List<HBox> toDelete = new ArrayList<>();
+     * Pattern pattern = null;
+     * 
+     * try {
+     * pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
+     * } catch (PatternSyntaxException e) {
+     * // Handle invalid regular expression
+     * e.printStackTrace();
+     * return;
+     * }
+     * 
+     * for (Node hBox : dialog.getChildren()) {
+     * for (Node label : ((HBox) hBox).getChildren()) {
+     * String labelText = ((Label) label).getText();
+     * boolean matches = (pattern.matcher(labelText).find());
+     * if (!matches) {
+     * toDelete.add((HBox) hBox);
+     * break; // No need to check other labels within this HBox
+     * }
+     * }
+     * }
+     * 
+     * dialog.getChildren().removeAll(toDelete);
+     * text.setText("");
+     * }
+     */
 
     private Pane createInputWidget() {
         final Pane input = new HBox();
