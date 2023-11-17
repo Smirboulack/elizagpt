@@ -21,12 +21,14 @@ public class App extends Application {
     public void start(final Stage stage) throws Exception {
         JfxView view1 = new JfxView(stage, 600, 600);
         JfxView view2 = new JfxView(new Stage(), 400, 400);
-        //JfxView view3 = new JfxView(new Stage(), 200, 200);
+        JfxView view3 = new JfxView(new Stage(), 200, 200);
         MessageProcessor model = new MessageProcessor();
         List<JfxView> view = new ArrayList<JfxView>();
         view.add(view1);
         view.add(view2);
+        view.add(view3);
         MessageController controller = new MessageController(model, view);
+
     }
 
     /**

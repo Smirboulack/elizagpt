@@ -1,8 +1,9 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,10 +23,11 @@ import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
  */
 public class JfxView {
     private final VBox dialog;
+    private Map<String, HBox> hBoxMap = new HashMap<>(); // Stocke les HBoxes avec leurs identifiants
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
-    private List<HBox> originalChildren;
+    private List<HBox> chatHistory;
     private MessageController controller;
 
     /**
@@ -47,7 +49,7 @@ public class JfxView {
 
         final Pane input = createInputWidget();
         root.getChildren().add(input);
-        displayElizaMessage("Bonjour");
+        displayElizaMessage("Bonjour", "0");
 
         // Everything's ready: add it to the scene and display it
         final Scene scene = new Scene(root, width, height);
@@ -86,10 +88,20 @@ public class JfxView {
      * 
      * @param message
      */
-    public void displayUserMessage(final String message) {
+    public void displayUserMessage(final String message, final String messageId) {
         // Logic to display user's message on the view
-        HBox hBox = createUserMessageHBox(message);
+        HBox hBox = new HBox();
+        Label label = new Label(message);
+        label.setStyle(USER_STYLE);
+        hBox.setAlignment(Pos.BASELINE_RIGHT);
+        hBox.getChildren().add(label);
+        hBoxMap.put(messageId, hBox);
         dialog.getChildren().add(hBox);
+
+        hBox.setOnMouseClicked(e -> {
+            controller.removeMessageFromAllViews(messageId);
+        });
+
     }
 
     /**
@@ -97,37 +109,34 @@ public class JfxView {
      * 
      * @param message
      */
-    public void displayElizaMessage(final String message) {
+    public void displayElizaMessage(final String message, final String messageId) {
         // Logic to display Eliza's response on the view
-        HBox hBox = createElizaMessageHBox(message);
-        dialog.getChildren().add(hBox);
-    }
-
-    private HBox createUserMessageHBox(final String message) {
-        HBox hBox = new HBox();
-        Label label = new Label(message);
-        label.setStyle(USER_STYLE);
-        hBox.setAlignment(Pos.BASELINE_RIGHT);
-        hBox.getChildren().add(label);
-        // Add an event handler to handle clicks on the HBox
-        hBox.setOnMouseClicked(event -> {
-            // Remove the HBox (the message) on click
-            dialog.getChildren().remove(hBox);
-        });
-        System.out.println("createUserMessageHBox");
-        return hBox;
-    }
-
-    private HBox createElizaMessageHBox(final String message) {
         HBox hBox = new HBox();
         Label label = new Label(message);
         label.setStyle(ELIZA_STYLE);
         hBox.setAlignment(Pos.BASELINE_LEFT);
         hBox.getChildren().add(label);
-        hBox.setOnMouseClicked(e -> dialog.getChildren().remove(hBox));
-        return hBox;
+        hBoxMap.put(messageId, hBox);
+        dialog.getChildren().add(hBox);
+        
+        hBox.setOnMouseClicked(e -> {
+            controller.removeMessageFromAllViews(messageId);
+        });
+
     }
 
+    public void removeMessage(String messageId) {
+        HBox hBox = hBoxMap.get(messageId);
+        if (hBox != null) {
+            dialog.getChildren().remove(hBox);
+        }
+    }
+
+    /**
+     * Return the search text field.
+     * 
+     * @return the search text field.
+     */
     public TextField getSearchText() {
         return searchText;
     }
@@ -191,6 +200,22 @@ public class JfxView {
     }
 
     /**
+     * return the chatHistory.
+     */
+    public List<HBox> getChatHistory() {
+        return this.chatHistory;
+    }
+
+    /**
+     * Set the chatHistory.
+     *
+     * @param chatHistory
+     */
+    public void setChatHistory(final List<HBox> chatHistory) {
+        this.chatHistory = new ArrayList<>(chatHistory);
+    }
+
+    /**
      * Display the search results in the dialog.
      */
     public void displaySearchResults(final List<HBox> searchResults, final String searchText) {
@@ -224,81 +249,12 @@ public class JfxView {
         final Button undo = new Button("Undo search");
         undo.setOnAction(e -> {
             controller.undoSearch();
-            // throw new UnsupportedOperationException("TODO: implement undo for search");
         });
         secondLine.getChildren().addAll(send, searchTextLabel, undo);
         final VBox input = new VBox();
         input.getChildren().addAll(firstLine, secondLine);
         return input;
     }
-
-    /**
-     * Save the original state of the dialog.
-     */
-    public void saveOriginalState() {
-        this.originalChildren = new ArrayList<>(this.getDialog().getChildren().stream()
-                .filter(node -> node instanceof HBox)
-                .map(node -> (HBox) node)
-                .collect(Collectors.toList()));
-
-        //afficher en console le contenu de originalChildren
-        for (HBox hBox : originalChildren) {
-            for (Label label : hBox.getChildren().stream()
-                    .filter(node -> node instanceof Label)
-                    .map(node -> (Label) node)
-                    .collect(Collectors.toList())) {
-                System.out.println("saveOriginalState provenant de la fenetre :" 
-                + this.getDialog().getScene().getWindow().toString() + " : ");
-                System.out.println(label.getText());
-            }
-        }
-    }
-
-    /**
-     * Restore the original state of the dialog.
-     */
-    public void restoreOriginalState() {
-        if (this.originalChildren != null) {
-            this.getDialog().getChildren().clear();
-            this.getDialog().getChildren().addAll(this.originalChildren);
-        }
-    }
-
-    /*
-     * private void searchText(final TextField text) {
-     * String currentSearchText = text.getText();
-     * if (currentSearchText == null || currentSearchText.isEmpty()) {
-     * searchTextLabel.setText("No active search");
-     * } else {
-     * searchTextLabel.setText("Searching for: " + currentSearchText);
-     * }
-     * 
-     * List<HBox> toDelete = new ArrayList<>();
-     * Pattern pattern = null;
-     * 
-     * try {
-     * pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
-     * } catch (PatternSyntaxException e) {
-     * // Handle invalid regular expression
-     * e.printStackTrace();
-     * return;
-     * }
-     * 
-     * for (Node hBox : dialog.getChildren()) {
-     * for (Node label : ((HBox) hBox).getChildren()) {
-     * String labelText = ((Label) label).getText();
-     * boolean matches = (pattern.matcher(labelText).find());
-     * if (!matches) {
-     * toDelete.add((HBox) hBox);
-     * break; // No need to check other labels within this HBox
-     * }
-     * }
-     * }
-     * 
-     * dialog.getChildren().removeAll(toDelete);
-     * text.setText("");
-     * }
-     */
 
     private Pane createInputWidget() {
         final Pane input = new HBox();

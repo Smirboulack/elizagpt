@@ -8,6 +8,7 @@ import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -39,8 +40,7 @@ public class MessageController {
     }
 
     /**
-     * Process the user input.
-     * 
+     * Process the receveid message.
      * @param input
      */
     public void processUserInput(final String input) {
@@ -51,22 +51,24 @@ public class MessageController {
         }
 
         String response = generateResponse(model.normalize(input));
+        // create random string id
+        String messageIdUser = String.valueOf(random.nextInt());
+        String messageIdEliza = String.valueOf(random.nextInt());
         for (JfxView v : views) {
-            v.displayUserMessage(input);
-            v.displayElizaMessage(response);
+            v.displayUserMessage(input,messageIdUser);
+            v.displayElizaMessage(response,messageIdEliza);
         }
-        /*
-         * view.displayUserMessage(input);
-         * System.out.println(response);
-         * view.displayElizaMessage(response);
-         */
-        System.out.println("l'affichage est fini");
+    }
+
+    public void removeMessageFromAllViews(String messageId) {
+        for (JfxView v : views) {
+            v.removeMessage(messageId);
+        }
     }
 
     private String generateResponse(final String normalizedText) {
         Matcher matcher;
         String response;
-        System.out.println(model.getName());
         matcher = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
                 .matcher(normalizedText);
         if (matcher.matches()) {
@@ -135,16 +137,12 @@ public class MessageController {
         return response;
     }
 
-    private void searchText(final TextField text, final List<JfxView> views) {
+    private void searchText(final TextField text, final JfxView view) {
         String currentSearchText = text.getText();
         if (currentSearchText == null || currentSearchText.isEmpty()) {
-            for (JfxView view : views) {
-                view.getSearchTextLabel().setText("No active search");
-            }
+            view.getSearchTextLabel().setText("No active search");
         } else {
-            for (JfxView view : views) {
-                view.getSearchTextLabel().setText("Searching for: " + currentSearchText);
-            }
+            view.getSearchTextLabel().setText("Searching for: " + currentSearchText);
         }
 
         Pattern pattern = null;
@@ -156,21 +154,30 @@ public class MessageController {
             return;
         }
 
-        for (JfxView view : views) {
-            List<HBox> toDelete = new ArrayList<>();
-            for (Node hBox : view.getDialog().getChildren()) {
-                for (Node label : ((HBox) hBox).getChildren()) {
-                    String labelText = ((Label) label).getText();
-                    boolean matches = (pattern.matcher(labelText).find());
-                    if (!matches) {
-                        toDelete.add((HBox) hBox);
-                        break; // No need to check other labels within this HBox
-                    }
+        List<HBox> toDelete = new ArrayList<>();
+        for (Node hBox : view.getDialog().getChildren()) {
+            for (Node label : ((HBox) hBox).getChildren()) {
+                String labelText = ((Label) label).getText();
+                boolean matches = (pattern.matcher(labelText).find());
+                if (!matches) {
+                    toDelete.add((HBox) hBox);
+                    break; // No need to check other labels within this HBox
                 }
             }
-            view.getDialog().getChildren().removeAll(toDelete);
         }
+        view.getDialog().getChildren().removeAll(toDelete);
         // text.setText("");
+    }
+
+    /**
+     * Remove a message from the views.
+     * 
+     * @param hBox
+     */
+    public void removeMessage(final HBox hBox) {
+        for (JfxView jfxView : views) {
+            jfxView.getDialog().getChildren().remove(hBox);
+        }
     }
 
     /**
@@ -180,14 +187,17 @@ public class MessageController {
      */
     public void performSearch(final String searchText) {
         // On sauvegarde l'état actuel de la vue
-        for (JfxView jfview2 : views) {
-            jfview2.saveOriginalState();
-        }
         for (JfxView jfxView : views) {
-
+            jfxView.setChatHistory(new ArrayList<>(jfxView.getDialog().getChildren().stream()
+                    .filter(node -> node instanceof HBox)
+                    .map(node -> (HBox) node)
+                    .collect(Collectors.toList())));
+        }
+        // On effectue la recherche
+        for (JfxView jfxView : views) {
             TextField textField = jfxView.getSearchText();
             textField.setText(searchText);
-            searchText(textField, views);
+            searchText(textField, jfxView);
         }
     }
 
@@ -195,51 +205,13 @@ public class MessageController {
      * Undo the search.
      */
     public void undoSearch() {
+        // On restaure l'état original de la vue
         for (JfxView jfxView : views) {
-            jfxView.restoreOriginalState();
+            if (jfxView.getChatHistory() != null) {
+                jfxView.getDialog().getChildren().clear();
+                jfxView.getDialog().getChildren().addAll(jfxView.getChatHistory());
+            }
         }
     }
-
-    /*
-     * public void performSearch(final String searchText) {
-     * // Compile the pattern once, outside of the loop
-     * Pattern pattern = null;
-     * if (searchText != null && !searchText.isEmpty()) {
-     * try {
-     * pattern = Pattern.compile(searchText, Pattern.CASE_INSENSITIVE);
-     * } catch (PatternSyntaxException e) {
-     * // Handle invalid regular expression
-     * e.printStackTrace();
-     * for (JfxView view : views) {
-     * view.displaySearchResults(Collections.emptyList(), searchText);
-     * }
-     * return;
-     * }
-     * }
-     * 
-     * // Perform the search if the pattern is not null
-     * List<HBox> searchResults = new ArrayList<>();
-     * if (pattern != null) {
-     * for (Node hBox : views.get(1).getDialog().getChildren()) {
-     * for (Node label : ((HBox) hBox).getChildren()) {
-     * String labelText = ((Label) label).getText();
-     * if (pattern.matcher(labelText).find()) {
-     * searchResults.add((HBox) hBox);
-     * break; // Found a match, no need to check other labels within this HBox
-     * }
-     * }
-     * }
-     * }
-     * 
-     * // Display the search results on all views
-     * for (JfxView view : views) {
-     * if (searchText == null || searchText.isEmpty()) {
-     * view.displaySearchResults(Collections.emptyList(), "");
-     * } else {
-     * view.displaySearchResults(searchResults, searchText);
-     * }
-     * }
-     * }
-     */
 
 }
