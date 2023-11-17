@@ -55,12 +55,16 @@ public class MessageController {
         String messageIdUser = String.valueOf(random.nextInt());
         String messageIdEliza = String.valueOf(random.nextInt());
         for (JfxView v : views) {
-            v.displayUserMessage(input,messageIdUser);
-            v.displayElizaMessage(response,messageIdEliza);
+            v.displayUserMessage(input, messageIdUser);
+            v.displayElizaMessage(response, messageIdEliza);
         }
     }
 
-    public void removeMessageFromAllViews(String messageId) {
+    /**
+     * Process the receveid message.
+     * @param messageId
+     */
+    public void removeMessageFromAllViews(final String messageId) {
         for (JfxView v : views) {
             v.removeMessage(messageId);
         }

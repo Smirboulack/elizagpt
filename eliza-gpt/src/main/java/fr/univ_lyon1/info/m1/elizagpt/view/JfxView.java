@@ -23,7 +23,7 @@ import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
  */
 public class JfxView {
     private final VBox dialog;
-    private Map<String, HBox> hBoxMap = new HashMap<>(); // Stocke les HBoxes avec leurs identifiants
+    private Map<String, HBox> hBoxMap = new HashMap<>();
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
@@ -124,8 +124,12 @@ public class JfxView {
         });
 
     }
-
-    public void removeMessage(String messageId) {
+    /**
+     * Remove a message from the dialog.
+     * 
+     * @param messageId
+     */
+    public void removeMessage(final String messageId) {
         HBox hBox = hBoxMap.get(messageId);
         if (hBox != null) {
             dialog.getChildren().remove(hBox);
