@@ -49,7 +49,7 @@ public class JfxView {
 
         final Pane input = createInputWidget();
         root.getChildren().add(input);
-        displayMessage("Bonjour", "eliza", "0");
+        displayMessages("Bonjour", "eliza", "0");
 
         // Everything's ready: add it to the scene and display it
         final Scene scene = new Scene(root, width, height);
@@ -76,7 +76,7 @@ public class JfxView {
     /**
      * Display a message according to its author.
      */
-    public void displayMessage(final String message, final String author, final String messageId) {
+    public void displayMessages(final String message, final String author, final String messageId) {
         HBox hBox = new HBox();
         Label label = new Label(message);
         if (author.equals("user")) {
@@ -105,7 +105,6 @@ public class JfxView {
             // Suppression du HBox du dialogue
             dialog.getChildren().remove(hBox);
             controller.removeHBox(hBox);
-        
         }
     }
 

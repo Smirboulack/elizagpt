@@ -1,0 +1,3 @@
+{
+    "java.checkstyle.configuration": "${workspaceFolder}\\eliza-gpt\\target\\checkstyle-checker.xml"
+}

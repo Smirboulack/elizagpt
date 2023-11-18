@@ -45,19 +45,14 @@ public class MessageController {
      * @param input
      */
     public void processUserInput(final String input) {
-        Matcher nameMatcher = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
-                .matcher(input);
-        if (nameMatcher.matches()) {
-            model.setName(nameMatcher.group(1)); // Update the user's name in the model
-        }
 
         String response = generateResponse(model.normalize(input));
         // create random string id
         String messageIdUser = String.valueOf(random.nextInt());
         String messageIdEliza = String.valueOf(random.nextInt());
         for (JfxView v : views) {
-            v.displayMessage(input, "user", messageIdUser);
-            v.displayMessage(response, "eliza", messageIdEliza);
+            v.displayMessages(input, "user", messageIdUser);
+            v.displayMessages(response, "eliza", messageIdEliza);
         }
     }
 
@@ -78,6 +73,7 @@ public class MessageController {
         matcher = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
                 .matcher(normalizedText);
         if (matcher.matches()) {
+            model.setName(matcher.group(1));
             return "Bonjour " + matcher.group(1) + ".";
         }
         matcher = Pattern.compile("Quel est mon nom \\?", Pattern.CASE_INSENSITIVE)
@@ -115,6 +111,25 @@ public class MessageController {
             String startQuestion = model.pickRandom(new String[] {
                     "Je vous renvoie la question.",
                     "Ici, c'est moi qui pose les questions."
+            });
+            response = startQuestion;
+            return response;
+        }
+
+        // Matches "Au revoir"
+        matcher = Pattern.compile("(?i)^au revoir\\.$", Pattern.CASE_INSENSITIVE)
+        .matcher(normalizedText);
+        if (matcher.matches()) {
+            String str1 = "Au revoir";
+            String str2 = "Oh non, c'est trop triste de se quitter !";
+            if (model.getName() != null) {
+                str1 += " " + model.getName() + ".";
+                str2 = "Bon débarras, n'oublie pas de commit + push avant de partir "
+                        + model.getName() + ".";
+            }
+            String startQuestion = model.pickRandom(new String[] {
+                    str1,
+                    str2
             });
             response = startQuestion;
             return response;
