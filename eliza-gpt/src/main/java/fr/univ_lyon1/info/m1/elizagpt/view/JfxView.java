@@ -33,7 +33,7 @@ public class JfxView {
     /**
      * Main class of the View (GUI) of the application.
      */
-    public JfxView(final Stage stage, final int width, final int height) {
+    public JfxView(final Stage stage, final double width, final double height) {
         stage.setTitle("Eliza GPT");
         final VBox root = new VBox(10);
         final Pane search = createSearchWidget();
@@ -49,7 +49,7 @@ public class JfxView {
 
         final Pane input = createInputWidget();
         root.getChildren().add(input);
-        displayElizaMessage("Bonjour", "0");
+        displayMessage("Bonjour", "eliza", "0");
 
         // Everything's ready: add it to the scene and display it
         final Scene scene = new Scene(root, width, height);
@@ -74,56 +74,26 @@ public class JfxView {
     static final String ELIZA_STYLE = "-fx-background-color: #A0A0E0; " + BASE_STYLE;
 
     /**
-     * Send a message to Eliza.
-     * 
-     * @param text
+     * Display a message according to its author.
      */
-    private void sendMessage(final String text) {
-        controller.processUserInput(text);
-        this.text.setText("");
-    }
-
-    /**
-     * Display message from user.
-     * 
-     * @param message
-     */
-    public void displayUserMessage(final String message, final String messageId) {
-        // Logic to display user's message on the view
+    public void displayMessage(final String message, final String author, final String messageId) {
         HBox hBox = new HBox();
         Label label = new Label(message);
-        label.setStyle(USER_STYLE);
-        hBox.setAlignment(Pos.BASELINE_RIGHT);
+        if (author.equals("user")) {
+            label.setStyle(USER_STYLE);
+            hBox.setAlignment(Pos.BASELINE_RIGHT);
+        } else if (author.equals("eliza")) {
+            label.setStyle(ELIZA_STYLE);
+            hBox.setAlignment(Pos.BASELINE_LEFT);
+        }
         hBox.getChildren().add(label);
         hBoxMap.put(messageId, hBox);
         dialog.getChildren().add(hBox);
-
         hBox.setOnMouseClicked(e -> {
-            controller.removeMessageFromAllViews(messageId);
+            controller.deleteMessageViews(messageId);
         });
-
     }
 
-    /**
-     * Display message from Eliza.
-     * 
-     * @param message
-     */
-    public void displayElizaMessage(final String message, final String messageId) {
-        // Logic to display Eliza's response on the view
-        HBox hBox = new HBox();
-        Label label = new Label(message);
-        label.setStyle(ELIZA_STYLE);
-        hBox.setAlignment(Pos.BASELINE_LEFT);
-        hBox.getChildren().add(label);
-        hBoxMap.put(messageId, hBox);
-        dialog.getChildren().add(hBox);
-        
-        hBox.setOnMouseClicked(e -> {
-            controller.removeMessageFromAllViews(messageId);
-        });
-
-    }
     /**
      * Remove a message from the dialog.
      * 
@@ -132,7 +102,10 @@ public class JfxView {
     public void removeMessage(final String messageId) {
         HBox hBox = hBoxMap.get(messageId);
         if (hBox != null) {
+            // Suppression du HBox du dialogue
             dialog.getChildren().remove(hBox);
+            controller.removeHBox(hBox);
+        
         }
     }
 
@@ -143,16 +116,6 @@ public class JfxView {
      */
     public TextField getSearchText() {
         return searchText;
-    }
-
-    /**
-     * Update the messages displayed in the dialog.
-     * 
-     * @param messages
-     */
-    public void updateMessages(final List<HBox> messages) {
-        dialog.getChildren().clear();
-        dialog.getChildren().addAll(messages);
     }
 
     /**
@@ -220,20 +183,7 @@ public class JfxView {
     }
 
     /**
-     * Display the search results in the dialog.
-     */
-    public void displaySearchResults(final List<HBox> searchResults, final String searchText) {
-        searchTextLabel.setText(searchResults.isEmpty()
-                ? "No results found for: " + searchText
-                : "Results for: " + searchText);
-        dialog.getChildren().setAll(searchResults);
-    }
-
-    /**
-     * Extract the name of the user from the dialog.
-     * TODO: this totally breaks the MVC pattern, never, ever, EVER do that.
-     *
-     * @return
+     * Create the search widget.
      */
     private Pane createSearchWidget() {
         final HBox firstLine = new HBox();
@@ -260,17 +210,20 @@ public class JfxView {
         return input;
     }
 
+    /**
+     * Create the input widget.
+     */
     private Pane createInputWidget() {
         final Pane input = new HBox();
         text = new TextField();
         text.setOnAction(e -> {
-            sendMessage(text.getText());
-            text.setText("");
+            controller.processUserInput(text.getText());
+            this.text.setText("");
         });
         final Button send = new Button("Send");
         send.setOnAction(e -> {
-            sendMessage(text.getText());
-            text.setText("");
+            controller.processUserInput(text.getText());
+            this.text.setText("");
         });
         input.getChildren().addAll(text, send);
         return input;

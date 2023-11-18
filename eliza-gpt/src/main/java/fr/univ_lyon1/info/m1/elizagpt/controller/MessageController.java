@@ -27,11 +27,10 @@ public class MessageController {
     /**
      * Constructor.
      * 
-     * @param model
      * @param view
      */
-    public MessageController(final MessageProcessor model, final List<JfxView> view) {
-        this.model = model;
+    public MessageController(final List<JfxView> view) {
+        this.model = new MessageProcessor();
         this.views = view;
         for (JfxView v : views) {
             v.setController(this);
@@ -40,7 +39,9 @@ public class MessageController {
     }
 
     /**
-     * Process the receveid message.
+     * Process the sended message, generate a response and call the view to display
+     * it.
+     * 
      * @param input
      */
     public void processUserInput(final String input) {
@@ -55,16 +56,17 @@ public class MessageController {
         String messageIdUser = String.valueOf(random.nextInt());
         String messageIdEliza = String.valueOf(random.nextInt());
         for (JfxView v : views) {
-            v.displayUserMessage(input, messageIdUser);
-            v.displayElizaMessage(response, messageIdEliza);
+            v.displayMessage(input, "user", messageIdUser);
+            v.displayMessage(response, "eliza", messageIdEliza);
         }
     }
 
     /**
      * Process the receveid message.
+     * 
      * @param messageId
      */
-    public void removeMessageFromAllViews(final String messageId) {
+    public void deleteMessageViews(final String messageId) {
         for (JfxView v : views) {
             v.removeMessage(messageId);
         }
@@ -174,13 +176,23 @@ public class MessageController {
     }
 
     /**
-     * Remove a message from the views.
-     * 
-     * @param hBox
+     * Save the current state of the chat.
      */
-    public void removeMessage(final HBox hBox) {
+    public void saveChatState() {
         for (JfxView jfxView : views) {
-            jfxView.getDialog().getChildren().remove(hBox);
+            jfxView.setChatHistory(new ArrayList<>(jfxView.getDialog().getChildren().stream()
+                    .filter(node -> node instanceof HBox)
+                    .map(node -> (HBox) node)
+                    .collect(Collectors.toList())));
+        }
+    }
+
+    /**
+     * Remove a HBox from the ChatHistory.
+     */
+    public void removeHBox(final HBox hBox) {
+        for (JfxView jfxView : views) {
+            jfxView.getChatHistory().remove(hBox);
         }
     }
 
@@ -190,13 +202,8 @@ public class MessageController {
      * @param searchText
      */
     public void performSearch(final String searchText) {
-        // On sauvegarde l'état actuel de la vue
-        for (JfxView jfxView : views) {
-            jfxView.setChatHistory(new ArrayList<>(jfxView.getDialog().getChildren().stream()
-                    .filter(node -> node instanceof HBox)
-                    .map(node -> (HBox) node)
-                    .collect(Collectors.toList())));
-        }
+        // On sauvegarde l'état actuel du Chat.
+        saveChatState();
         // On effectue la recherche
         for (JfxView jfxView : views) {
             TextField textField = jfxView.getSearchText();
@@ -213,9 +220,12 @@ public class MessageController {
         for (JfxView jfxView : views) {
             if (jfxView.getChatHistory() != null) {
                 jfxView.getDialog().getChildren().clear();
+                jfxView.getSearchTextLabel().setText("");
                 jfxView.getDialog().getChildren().addAll(jfxView.getChatHistory());
             }
+            jfxView.getSearchText().setText("");
         }
+
     }
 
 }

@@ -92,30 +92,6 @@ public class MessageProcessor {
         return array[random.nextInt(array.length)];
     }
 
-    /* public List<HBox> filterMessagesByPattern(final String patternText) {
-        Pattern pattern;
-        List<HBox> filteredMessages = new ArrayList<>();
-
-        try {
-            pattern = Pattern.compile(patternText, Pattern.CASE_INSENSITIVE);
-        } catch (PatternSyntaxException e) {
-            e.printStackTrace();
-            return messages; // Return all messages if pattern is invalid
-        }
-
-        for (HBox hBox : messages) {
-            for (Node label : hBox.getChildren()) {
-                String labelText = ((Label) label).getText();
-                if (pattern.matcher(labelText).find()) {
-                    filteredMessages.add(hBox);
-                    break;
-                }
-            }
-        }
-
-        return filteredMessages;
-    } */
-
     /**
      * return the username.
      */
