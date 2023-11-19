@@ -24,10 +24,10 @@ import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
 public class JfxView {
     private final VBox dialog;
     private Map<String, HBox> hBoxMap = new HashMap<>();
+    private List<HBox> chatHistory;
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
-    private List<HBox> chatHistory;
     private MessageController controller;
 
     /**
@@ -92,20 +92,6 @@ public class JfxView {
         hBox.setOnMouseClicked(e -> {
             controller.deleteMessageViews(messageId);
         });
-    }
-
-    /**
-     * Remove a message from the dialog.
-     * 
-     * @param messageId
-     */
-    public void removeMessage(final String messageId) {
-        HBox hBox = hBoxMap.get(messageId);
-        if (hBox != null) {
-            // Suppression du HBox du dialogue
-            dialog.getChildren().remove(hBox);
-            controller.removeHBox(hBox);
-        }
     }
 
     /**
@@ -191,12 +177,12 @@ public class JfxView {
         secondLine.setAlignment(Pos.BASELINE_LEFT);
         searchText = new TextField();
         searchText.setOnAction(e -> {
-            controller.performSearch(searchText.getText());
+            controller.searchText(searchText.getText());
         });
         firstLine.getChildren().add(searchText);
         final Button send = new Button("Search");
         send.setOnAction(e -> {
-            controller.performSearch(searchText.getText());
+            controller.searchText(searchText.getText());
         });
         searchTextLabel = new Label();
         final Button undo = new Button("Undo search");
@@ -226,5 +212,9 @@ public class JfxView {
         });
         input.getChildren().addAll(text, send);
         return input;
+    }
+
+    public Map<String, HBox> getHBoxMap() {
+        return hBoxMap;
     }
 }

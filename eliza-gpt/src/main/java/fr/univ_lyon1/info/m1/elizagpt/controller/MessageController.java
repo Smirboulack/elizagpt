@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
 /**
@@ -60,40 +59,17 @@ public class MessageController {
      */
     public void deleteMessageViews(final String messageId) {
         for (JfxView v : views) {
-            v.removeMessage(messageId);
-        }
-    }
-
-    private void searchText(final TextField text, final JfxView view) {
-        String currentSearchText = text.getText();
-        if (currentSearchText == null || currentSearchText.isEmpty()) {
-            view.getSearchTextLabel().setText("No active search");
-        } else {
-            view.getSearchTextLabel().setText("Searching for: " + currentSearchText);
-        }
-
-        Pattern pattern = null;
-        try {
-            pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
-        } catch (PatternSyntaxException e) {
-            // Handle invalid regular expression
-            e.printStackTrace();
-            return;
-        }
-
-        List<HBox> toDelete = new ArrayList<>();
-        for (Node hBox : view.getDialog().getChildren()) {
-            for (Node label : ((HBox) hBox).getChildren()) {
-                String labelText = ((Label) label).getText();
-                boolean matches = (pattern.matcher(labelText).find());
-                if (!matches) {
-                    toDelete.add((HBox) hBox);
-                    break; // No need to check other labels within this HBox
-                }
+            HBox hBox = v.getHBoxMap().get(messageId);
+            if (hBox != null) {
+                v.getDialog().getChildren().remove(hBox);
+            }
+            if (v.getHBoxMap().containsKey(messageId)) {
+                v.getHBoxMap().remove(messageId);
+            }
+            if (v.getChatHistory() != null) {
+                v.getChatHistory().remove(hBox);
             }
         }
-        view.getDialog().getChildren().removeAll(toDelete);
-        // text.setText("");
     }
 
     /**
@@ -109,27 +85,51 @@ public class MessageController {
     }
 
     /**
+     * Search for a text in the chat.
+     */
+    public void searchText(final String text) {
+        saveChatState(); // On sauvegarde l'état actuel du Chat.
+        for (JfxView view : views) {
+            view.getSearchText().setText(text);
+            String currentSearchText = view.getSearchText().getText();
+            if (currentSearchText == null || currentSearchText.isEmpty()) {
+                view.getSearchTextLabel().setText("No active search");
+            } else {
+                view.getSearchTextLabel().setText("Searching for: " + currentSearchText);
+            }
+
+            Pattern pattern = null;
+            try {
+                pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
+            } catch (PatternSyntaxException e) {
+                // Handle invalid regular expression
+                e.printStackTrace();
+                return;
+            }
+
+            List<HBox> toDelete = new ArrayList<>();
+            for (Node hBox : view.getDialog().getChildren()) {
+                for (Node label : ((HBox) hBox).getChildren()) {
+                    String labelText = ((Label) label).getText();
+                    boolean matches = (pattern.matcher(labelText).find());
+                    if (!matches) {
+                        toDelete.add((HBox) hBox);
+                        break; // No need to check other labels within this HBox
+                    }
+                }
+            }
+            view.getDialog().getChildren().removeAll(toDelete);
+            // text.setText("");
+        }
+
+    }
+
+    /**
      * Remove a HBox from the ChatHistory.
      */
     public void removeHBox(final HBox hBox) {
         for (JfxView jfxView : views) {
             jfxView.getChatHistory().remove(hBox);
-        }
-    }
-
-    /**
-     * Perform a search.
-     * 
-     * @param searchText
-     */
-    public void performSearch(final String searchText) {
-        // On sauvegarde l'état actuel du Chat.
-        saveChatState();
-        // On effectue la recherche
-        for (JfxView jfxView : views) {
-            TextField textField = jfxView.getSearchText();
-            textField.setText(searchText);
-            searchText(textField, jfxView);
         }
     }
 
