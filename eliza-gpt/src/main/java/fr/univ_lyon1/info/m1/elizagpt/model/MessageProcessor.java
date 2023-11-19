@@ -3,13 +3,15 @@ package fr.univ_lyon1.info.m1.elizagpt.model;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Logic to process a message (and probably reply to it).
  */
 public class MessageProcessor {
-    //private List<HBox> messages;
-    private String username;
+    // private List<HBox> messages;
+    private String name;
     private final Random random = new Random();
 
     /**
@@ -87,23 +89,126 @@ public class MessageProcessor {
         return processedText;
     }
 
+    /**
+     * Generate a response to the input text.
+     * 
+     * @param normalizedText
+     * @return The response (String).
+     */
+    public String generateResponse(final String normalizedText) {
+        Matcher matcher;
+        String response;
+        
+        matcher = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
+                .matcher(normalizedText);
+        if (matcher.matches()) {
+            name = (matcher.group(1));
+            return "Bonjour " + matcher.group(1) + ".";
+        }
+        matcher = Pattern.compile("Quel est mon nom \\?", Pattern.CASE_INSENSITIVE)
+                .matcher(normalizedText);
+        if (matcher.matches()) {
+            if (name != null) {
+                response = "Votre nom est " + name + ".";
+            } else {
+                response = "Je ne connais pas votre nom.";
+            }
+            return response;
+        }
+
+        matcher = Pattern.compile("Qui est le plus (.*) \\?", Pattern.CASE_INSENSITIVE)
+                .matcher(normalizedText);
+        if (matcher.matches()) {
+            response = "Le plus " + matcher.group(1) + " est bien sûr votre enseignant de MIF01 !";
+            return response;
+        }
+
+        matcher = Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE).matcher(normalizedText);
+        if (matcher.matches()) {
+            String startQuestion = pickRandom(new String[] {
+                    "Pourquoi dites-vous que ",
+                    "Pourquoi pensez-vous que ",
+                    "Êtes-vous sûr que ",
+            });
+            response = startQuestion + firstToSecondPerson(matcher.group(1)) + " ?";
+            return response;
+        }
+
+        matcher = Pattern.compile(".*\\?$", Pattern.CASE_INSENSITIVE).matcher(normalizedText);
+        if (matcher.matches()) {
+            String startQuestion = pickRandom(new String[] {
+                    "Je vous renvoie la question.",
+                    "Ici, c'est moi qui pose les questions."
+            });
+            response = startQuestion;
+            return response;
+        }
+
+        // Matches "Au revoir"
+        matcher = Pattern.compile("(?i)^au revoir\\.$", Pattern.CASE_INSENSITIVE)
+                .matcher(normalizedText);
+        if (matcher.matches()) {
+            String str1 = "Au revoir";
+            String str2 = "Oh non, c'est trop triste de se quitter !";
+            if (getName() != null) {
+                str1 += " " + getName() + ".";
+                str2 = "Bon débarras, n'oublie pas de commit + push avant de partir "
+                        + getName() + ".";
+            }
+            String startQuestion = pickRandom(new String[] {
+                    str1,
+                    str2
+            });
+            response = startQuestion;
+            return response;
+        }
+
+        // Random responses
+        String[] randomResponses = {
+                "Il fait beau aujourd'hui, vous ne trouvez pas ?",
+                "Je ne comprends pas.",
+                "Hmmm, hmm ..."
+        };
+        for (String randomResponse : randomResponses) {
+            if (getRandom().nextBoolean()) {
+                response = randomResponse;
+                return response;
+            }
+        }
+
+        // Default answer
+        if (name != null) {
+            response = "Qu'est-ce qui vous fait dire cela, " + name + " ?";
+        } else {
+            response = "Qu'est-ce qui vous fait dire cela ?";
+        }
+        return response;
+    }
+
     /** Pick an element randomly in the array. */
     public <T> T pickRandom(final T[] array) {
         return array[random.nextInt(array.length)];
     }
 
     /**
-     * return the username.
+     * return the name.
      */
     public String getName() {
-        return username;
+        return name;
     }
 
     /**
-     * Set the username.
+     * Get random.
      */
-    public void setName(final String username) {
-        this.username = username;
+    public Random getRandom() {
+        return random;
+    }
+
+    /**
+     * Set the name.
+     */
+    public void setName(final String name) {
+        this.name = name;
     }
 
 }

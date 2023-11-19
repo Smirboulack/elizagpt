@@ -5,7 +5,6 @@ import java.util.List;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
@@ -14,7 +13,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import java.util.Random;
 
 /**
  * Main class of the controller.
@@ -22,7 +20,6 @@ import java.util.Random;
 public class MessageController {
     private MessageProcessor model;
     private List<JfxView> views;
-    private final Random random = new Random();
 
     /**
      * Constructor.
@@ -46,10 +43,10 @@ public class MessageController {
      */
     public void processUserInput(final String input) {
 
-        String response = generateResponse(model.normalize(input));
+        String response = model.generateResponse(model.normalize(input));
         // create random string id
-        String messageIdUser = String.valueOf(random.nextInt());
-        String messageIdEliza = String.valueOf(random.nextInt());
+        String messageIdUser = String.valueOf(model.getRandom().nextInt());
+        String messageIdEliza = String.valueOf(model.getRandom().nextInt());
         for (JfxView v : views) {
             v.displayMessages(input, "user", messageIdUser);
             v.displayMessages(response, "eliza", messageIdEliza);
@@ -65,97 +62,6 @@ public class MessageController {
         for (JfxView v : views) {
             v.removeMessage(messageId);
         }
-    }
-
-    private String generateResponse(final String normalizedText) {
-        Matcher matcher;
-        String response;
-        matcher = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
-                .matcher(normalizedText);
-        if (matcher.matches()) {
-            model.setName(matcher.group(1));
-            return "Bonjour " + matcher.group(1) + ".";
-        }
-        matcher = Pattern.compile("Quel est mon nom \\?", Pattern.CASE_INSENSITIVE)
-                .matcher(normalizedText);
-        if (matcher.matches()) {
-            String name = model.getName();
-            if (name != null) {
-                response = "Votre nom est " + name + ".";
-            } else {
-                response = "Je ne connais pas votre nom.";
-            }
-            return response;
-        }
-
-        matcher = Pattern.compile("Qui est le plus (.*) \\?", Pattern.CASE_INSENSITIVE)
-                .matcher(normalizedText);
-        if (matcher.matches()) {
-            response = "Le plus " + matcher.group(1) + " est bien sûr votre enseignant de MIF01 !";
-            return response;
-        }
-
-        matcher = Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE).matcher(normalizedText);
-        if (matcher.matches()) {
-            String startQuestion = model.pickRandom(new String[] {
-                    "Pourquoi dites-vous que ",
-                    "Pourquoi pensez-vous que ",
-                    "Êtes-vous sûr que ",
-            });
-            response = startQuestion + model.firstToSecondPerson(matcher.group(1)) + " ?";
-            return response;
-        }
-
-        matcher = Pattern.compile(".*\\?$", Pattern.CASE_INSENSITIVE).matcher(normalizedText);
-        if (matcher.matches()) {
-            String startQuestion = model.pickRandom(new String[] {
-                    "Je vous renvoie la question.",
-                    "Ici, c'est moi qui pose les questions."
-            });
-            response = startQuestion;
-            return response;
-        }
-
-        // Matches "Au revoir"
-        matcher = Pattern.compile("(?i)^au revoir\\.$", Pattern.CASE_INSENSITIVE)
-        .matcher(normalizedText);
-        if (matcher.matches()) {
-            String str1 = "Au revoir";
-            String str2 = "Oh non, c'est trop triste de se quitter !";
-            if (model.getName() != null) {
-                str1 += " " + model.getName() + ".";
-                str2 = "Bon débarras, n'oublie pas de commit + push avant de partir "
-                        + model.getName() + ".";
-            }
-            String startQuestion = model.pickRandom(new String[] {
-                    str1,
-                    str2
-            });
-            response = startQuestion;
-            return response;
-        }
-
-        // Random responses
-        String[] randomResponses = {
-                "Il fait beau aujourd'hui, vous ne trouvez pas ?",
-                "Je ne comprends pas.",
-                "Hmmm, hmm ..."
-        };
-        for (String randomResponse : randomResponses) {
-            if (random.nextBoolean()) {
-                response = randomResponse;
-                return response;
-            }
-        }
-
-        // Default answer
-        String name = model.getName();
-        if (name != null) {
-            response = "Qu'est-ce qui vous fait dire cela, " + name + " ?";
-        } else {
-            response = "Qu'est-ce qui vous fait dire cela ?";
-        }
-        return response;
     }
 
     private void searchText(final TextField text, final JfxView view) {
