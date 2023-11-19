@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
@@ -42,7 +40,8 @@ public class MessageProcessor {
                 .setScanners(new SubTypesScanner(false))
                 .addUrls(ClasspathHelper
                         .forPackage("fr.univ_lyon1.info.m1.elizagpt.model.responserules")));
-        Set<Class<? extends IResponseRule>> classes = reflections.getSubTypesOf(IResponseRule.class);
+        Set<Class<? extends IResponseRule>> classes = 
+        reflections.getSubTypesOf(IResponseRule.class);
         for (Class<? extends IResponseRule> c : classes) {
             try {
                 responseRules.add(c.getDeclaredConstructor().newInstance());
