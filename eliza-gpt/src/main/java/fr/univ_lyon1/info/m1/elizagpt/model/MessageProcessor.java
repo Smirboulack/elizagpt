@@ -8,12 +8,10 @@ import java.util.Random;
 import java.util.Set;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-
 import fr.univ_lyon1.info.m1.elizagpt.model.responserules.IResponseRule;
-
-import org.reflections.scanners.SubTypesScanner;
 
 /**
  * Logic to process a message (and probably reply to it).
@@ -33,15 +31,15 @@ public class MessageProcessor {
     }
 
     /**
-     * Load the response rules dynamically from the package.
+     * Load all the response rules dynamically.
      */
     private void loadResponseRulesDynamically() {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setScanners(new SubTypesScanner(false))
                 .addUrls(ClasspathHelper
                         .forPackage("fr.univ_lyon1.info.m1.elizagpt.model.responserules")));
-        Set<Class<? extends IResponseRule>> classes = 
-        reflections.getSubTypesOf(IResponseRule.class);
+        Set<Class<? extends IResponseRule>> classes = reflections
+                .getSubTypesOf(IResponseRule.class);
         for (Class<? extends IResponseRule> c : classes) {
             try {
                 responseRules.add(c.getDeclaredConstructor().newInstance());

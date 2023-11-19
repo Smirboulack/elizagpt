@@ -62,8 +62,6 @@ public class MessageController {
             HBox hBox = v.getHBoxMap().get(messageId);
             if (hBox != null) {
                 v.getDialog().getChildren().remove(hBox);
-            }
-            if (v.getHBoxMap().containsKey(messageId)) {
                 v.getHBoxMap().remove(messageId);
             }
             if (v.getChatHistory() != null) {

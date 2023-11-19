@@ -8,6 +8,7 @@ import java.util.Map;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -171,26 +172,38 @@ public class JfxView {
      * Create the search widget.
      */
     private Pane createSearchWidget() {
-        final HBox firstLine = new HBox();
-        final HBox secondLine = new HBox();
+        final HBox firstLine = new HBox(10); // Le chiffre indique l'espace entre les éléments
+        final HBox secondLine = new HBox(10);
         firstLine.setAlignment(Pos.BASELINE_LEFT);
         secondLine.setAlignment(Pos.BASELINE_LEFT);
+
         searchText = new TextField();
         searchText.setOnAction(e -> {
             controller.searchText(searchText.getText());
         });
         firstLine.getChildren().add(searchText);
+
+        final ComboBox<String> searchTypeComboBox = new ComboBox<>();
+        searchTypeComboBox.getItems().addAll("Substring", "Regexp");
+        searchTypeComboBox.setValue("Substring");
+        firstLine.getChildren().add(searchTypeComboBox);
+
         final Button send = new Button("Search");
         send.setOnAction(e -> {
+            String searchType = searchTypeComboBox.getValue();
             controller.searchText(searchText.getText());
         });
+
         searchTextLabel = new Label();
+
         final Button undo = new Button("Undo search");
         undo.setOnAction(e -> {
             controller.undoSearch();
         });
+
         secondLine.getChildren().addAll(send, searchTextLabel, undo);
-        final VBox input = new VBox();
+
+        final VBox input = new VBox(5);
         input.getChildren().addAll(firstLine, secondLine);
         return input;
     }
