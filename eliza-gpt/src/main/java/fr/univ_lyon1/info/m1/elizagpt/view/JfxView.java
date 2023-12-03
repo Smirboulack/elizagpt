@@ -18,6 +18,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
+import fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy.SearchStrategy;
+
+import javafx.util.StringConverter;
 
 /**
  * Main class of the View (GUI) of the application.
@@ -29,6 +32,7 @@ public class JfxView {
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
+    private ComboBox<SearchStrategy> comboBox;
     private MessageController controller;
 
     /**
@@ -37,6 +41,7 @@ public class JfxView {
     public JfxView(final Stage stage, final double width, final double height) {
         stage.setTitle("Eliza GPT");
         final VBox root = new VBox(10);
+        this.comboBox = new ComboBox<>();
         final Pane search = createSearchWidget();
         root.getChildren().add(search);
 
@@ -50,6 +55,7 @@ public class JfxView {
 
         final Pane input = createInputWidget();
         root.getChildren().add(input);
+        // root.getChildren().add(this.comboBox); // Ajout de la ComboBox
         displayMessages("Bonjour", "eliza", "0");
 
         // Everything's ready: add it to the scene and display it
@@ -66,6 +72,23 @@ public class JfxView {
      */
     public void setController(final MessageController controller) {
         this.controller = controller;
+        initializeComboBox();
+    }
+
+    private void initializeComboBox() {
+        comboBox.setItems(controller.getListeObservable());
+        comboBox.setConverter(new StringConverter<SearchStrategy>() {
+            @Override
+            public String toString(SearchStrategy object) {
+                return object.getClass().getSimpleName();
+            }
+
+            @Override
+            public SearchStrategy fromString(String string) {
+                return null;
+            }
+        });
+        comboBox.getSelectionModel().selectFirst();
     }
 
     static final String BASE_STYLE = "-fx-padding: 8px; "
@@ -173,34 +196,32 @@ public class JfxView {
      */
     private Pane createSearchWidget() {
         final HBox firstLine = new HBox(10); // Le chiffre indique l'espace entre les éléments
-        final HBox secondLine = new HBox(10);
-        firstLine.setAlignment(Pos.BASELINE_LEFT);
-        secondLine.setAlignment(Pos.BASELINE_LEFT);
 
         searchText = new TextField();
         searchText.setOnAction(e -> {
             controller.searchText(searchText.getText());
         });
-        firstLine.getChildren().add(searchText);
 
-        final ComboBox<String> searchTypeComboBox = new ComboBox<>();
-        searchTypeComboBox.getItems().addAll("Substring", "Regexp");
-        searchTypeComboBox.setValue("Substring");
-        firstLine.getChildren().add(searchTypeComboBox);
+        // Configuration du ComboBox
+        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                controller.changeSearchStrategy(newValue);
+            }
+        });
+
+        firstLine.getChildren().addAll(searchText, comboBox); // Ajoutez la ComboBox ici
 
         final Button send = new Button("Search");
         send.setOnAction(e -> {
-            String searchType = searchTypeComboBox.getValue();
             controller.searchText(searchText.getText());
         });
-
         searchTextLabel = new Label();
-
         final Button undo = new Button("Undo search");
         undo.setOnAction(e -> {
             controller.undoSearch();
         });
-
+        final HBox secondLine = new HBox(10);
+        secondLine.setAlignment(Pos.BASELINE_LEFT);
         secondLine.getChildren().addAll(send, searchTextLabel, undo);
 
         final VBox input = new VBox(5);

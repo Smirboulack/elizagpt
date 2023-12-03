@@ -3,15 +3,18 @@ package fr.univ_lyon1.info.m1.elizagpt.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy.SearchStrategy;
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
+import org.reflections.Reflections;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import java.util.Set;
 
 /**
  * Main class of the controller.
@@ -19,6 +22,8 @@ import javafx.scene.layout.HBox;
 public class MessageController {
     private MessageProcessor model;
     private List<JfxView> views;
+    private ObservableList<SearchStrategy> listeObservable = FXCollections.observableArrayList();
+    private SearchStrategy currentSearchStrategy;
 
     /**
      * Constructor.
@@ -28,10 +33,32 @@ public class MessageController {
     public MessageController(final List<JfxView> view) {
         this.model = new MessageProcessor();
         this.views = view;
+        this.chargerStrategies();
         for (JfxView v : views) {
             v.setController(this);
         }
-        // setupListeners();
+    }
+
+    public void chargerStrategies() {
+        Reflections reflections = new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
+        Set<Class<? extends SearchStrategy>> classes = reflections.getSubTypesOf(SearchStrategy.class);
+
+        for (Class<? extends SearchStrategy> classe : classes) {
+            try {
+                SearchStrategy strategy = classe.getDeclaredConstructor().newInstance();
+                listeObservable.add(strategy);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void changeSearchStrategy(SearchStrategy newValue) {
+        this.currentSearchStrategy = newValue;
+    }
+
+    public ObservableList<SearchStrategy> getListeObservable() {
+        return listeObservable;
     }
 
     /**
@@ -96,30 +123,20 @@ public class MessageController {
                 view.getSearchTextLabel().setText("Searching for: " + currentSearchText);
             }
 
-            Pattern pattern = null;
-            try {
-                pattern = Pattern.compile(currentSearchText, Pattern.CASE_INSENSITIVE);
-            } catch (PatternSyntaxException e) {
-                // Handle invalid regular expression
-                e.printStackTrace();
-                return;
-            }
-
             List<HBox> toDelete = new ArrayList<>();
             for (Node hBox : view.getDialog().getChildren()) {
                 for (Node label : ((HBox) hBox).getChildren()) {
                     String labelText = ((Label) label).getText();
-                    boolean matches = (pattern.matcher(labelText).find());
-                    if (!matches) {
-                        toDelete.add((HBox) hBox);
-                        break; // No need to check other labels within this HBox
+                    if (labelText != null && !labelText.isEmpty()) {
+                        if (!currentSearchStrategy.search(labelText, currentSearchText)) {
+                            toDelete.add((HBox) hBox);
+                        }
                     }
                 }
             }
             view.getDialog().getChildren().removeAll(toDelete);
             // text.setText("");
         }
-
     }
 
     /**
@@ -146,5 +163,7 @@ public class MessageController {
         }
 
     }
+
+    
 
 }
