@@ -39,9 +39,14 @@ public class MessageController {
         }
     }
 
+    /**
+     * Load all the search strategies.
+     */
     public void chargerStrategies() {
-        Reflections reflections = new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
-        Set<Class<? extends SearchStrategy>> classes = reflections.getSubTypesOf(SearchStrategy.class);
+        Reflections reflections = 
+        new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
+        Set<Class<? extends SearchStrategy>> classes = 
+        reflections.getSubTypesOf(SearchStrategy.class);
 
         for (Class<? extends SearchStrategy> classe : classes) {
             try {
@@ -53,7 +58,12 @@ public class MessageController {
         }
     }
 
-    public void changeSearchStrategy(SearchStrategy newValue) {
+    /**
+     * Change the current search strategy.
+     * 
+     * @param newValue
+     */
+    public void changeSearchStrategy(final SearchStrategy newValue) {
         this.currentSearchStrategy = newValue;
     }
 

@@ -79,12 +79,12 @@ public class JfxView {
         comboBox.setItems(controller.getListeObservable());
         comboBox.setConverter(new StringConverter<SearchStrategy>() {
             @Override
-            public String toString(SearchStrategy object) {
+            public String toString(final SearchStrategy object) {
                 return object.getClass().getSimpleName();
             }
 
             @Override
-            public SearchStrategy fromString(String string) {
+            public SearchStrategy fromString(final String string) {
                 return null;
             }
         });
@@ -203,7 +203,9 @@ public class JfxView {
         });
 
         // Configuration du ComboBox
-        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        comboBox.getSelectionModel()
+        .selectedItemProperty()
+        .addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 controller.changeSearchStrategy(newValue);
             }
