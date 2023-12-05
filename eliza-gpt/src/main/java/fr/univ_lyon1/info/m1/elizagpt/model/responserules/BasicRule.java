@@ -4,6 +4,8 @@ import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.opencsv.exceptions.CsvValidationException;
+
 /**
  * A response rule that generates a random response.
  */
@@ -40,7 +42,11 @@ public class BasicRule implements IResponseRule {
                     "Pourquoi pensez-vous que ",
                     "Êtes-vous sûr que ",
             });
-            return startQuestion + processor.firstToSecondPerson(matcher.group(1)) + " ?";
+            try {
+                return startQuestion + processor.firstToSecondPerson(matcher.group(1)) + " ?";
+            } catch (CsvValidationException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }

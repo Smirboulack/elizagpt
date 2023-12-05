@@ -40,6 +40,17 @@
             <artifactId>reflections</artifactId>
             <version>0.9.12</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20230618</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.8</version>
+        </dependency>
+
     </dependencies>
 
     <reporting>
