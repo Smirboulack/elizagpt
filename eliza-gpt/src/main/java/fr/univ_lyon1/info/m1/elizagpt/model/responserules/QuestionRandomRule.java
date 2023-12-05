@@ -1,9 +1,8 @@
-package fr.univ_lyon1.info.m1.elizagpt.model.questionrandom;
+package fr.univ_lyon1.info.m1.elizagpt.model.responserules;
 
 import java.util.regex.Pattern;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
-import fr.univ_lyon1.info.m1.elizagpt.model.responserules.IResponseRule;
 
 /**
  * Interface for a rule that generates a response.

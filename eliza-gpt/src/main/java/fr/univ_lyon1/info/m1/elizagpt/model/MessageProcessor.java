@@ -1,16 +1,17 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import fr.univ_lyon1.info.m1.elizagpt.model.Verbes.InMemoryVerbDao;
+import fr.univ_lyon1.info.m1.elizagpt.model.Verbes.Verb;
+import fr.univ_lyon1.info.m1.elizagpt.model.Verbes.VerbDao;
 import fr.univ_lyon1.info.m1.elizagpt.model.responserules.IResponseRule;
 
 /**
@@ -20,34 +21,52 @@ public class MessageProcessor {
     // private List<HBox> messages;
     private String name;
     private final Random random = new Random();
-    private List<IResponseRule> responseRules;
+    private VerbDao verbDao = new InMemoryVerbDao();
 
     /**
      * Constructor.
      */
     public MessageProcessor() {
-        responseRules = new ArrayList<>();
-        loadResponseRulesDynamically();
     }
 
     /**
      * Load all the response rules dynamically.
      */
-    private void loadResponseRulesDynamically() {
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setScanners(new SubTypesScanner(false))
-                .addUrls(ClasspathHelper
-                        .forPackage("fr.univ_lyon1.info.m1.elizagpt.model.responserules")));
-        Set<Class<? extends IResponseRule>> classes = reflections
-                .getSubTypesOf(IResponseRule.class);
-        for (Class<? extends IResponseRule> c : classes) {
-            try {
-                responseRules.add(c.getDeclaredConstructor().newInstance());
-            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                e.printStackTrace();
+    public List<IResponseRule> loadRulesFromConfig(final String configFilePath) {
+        List<IResponseRule> rules = new ArrayList<>();
+        Properties props = new Properties();
+
+        // Charger le fichier properties à partir du classpath
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream(configFilePath)) {
+            if (input == null) {
+                throw new 
+                FileNotFoundException("Fichier de configuration non trouvé dans le classpath");
             }
+
+            props.load(input);
+            String[] ruleClassNames = props.getProperty("rules").split(",");
+
+            for (String className : ruleClassNames) {
+                try {
+                    // Ajoutez le package complet avant le nom de la classe
+                    String fullClassName = "fr.univ_lyon1.info.m1.elizagpt.model.responserules." 
+                    + className.trim();
+                    Class<?> clazz = Class.forName(fullClassName);
+                    IResponseRule rule = 
+                    (IResponseRule) clazz.getDeclaredConstructor().newInstance();
+                    rules.add(rule);
+                } catch (ClassNotFoundException e) {
+                    System.err.println("La classe " + className.trim() + " n'a pas été trouvée.");
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
+
+        return rules;
     }
 
     /**
@@ -64,42 +83,6 @@ public class MessageProcessor {
     }
 
     /**
-     * Information about conjugation of a verb.
-     */
-    public static class Verb {
-        private final String firstSingular;
-        private final String secondPlural;
-
-        public String getFirstSingular() {
-            return firstSingular;
-        }
-
-        public String getSecondPlural() {
-            return secondPlural;
-        }
-
-        Verb(final String firstSingular, final String secondPlural) {
-            this.firstSingular = firstSingular;
-            this.secondPlural = secondPlural;
-        }
-    }
-
-    /**
-     * List of 3rd group verbs and their correspondance from 1st person signular
-     * (Je) to 2nd person plural (Vous).
-     */
-    protected static final List<Verb> VERBS = Arrays.asList(
-            new Verb("suis", "êtes"),
-            new Verb("vais", "allez"),
-            new Verb("dis", "dites"),
-            new Verb("ai", "avez"),
-            new Verb("peux", "pouvez"),
-            new Verb("dois", "devez"),
-            new Verb("fais", "faites"),
-            new Verb("sais", "savez"),
-            new Verb("dois", "devez"));
-
-    /**
      * Turn a 1st-person sentence (Je ...) into a plural 2nd person (Vous ...).
      * The result is not capitalized to allow forming a new sentence.
      *
@@ -109,19 +92,25 @@ public class MessageProcessor {
      * @return The 2nd-person sentence.
      */
     public String firstToSecondPerson(final String text) {
-        String processedText = text
-                .replaceAll("[Jj]e ([a-z]*)e ", "vous $1ez ");
-        for (Verb v : VERBS) {
+        List<Verb> verbs = verbDao.getAllVerbs();
+        String processedText = text;
+
+        // Remplacer chaque verbe spécifique
+        for (Verb verb : verbs) {
             processedText = processedText.replaceAll(
-                    "[Jj]e " + v.getFirstSingular(),
-                    "vous " + v.getSecondPlural());
+                    "[Jj]e " + verb.getFirstSingular() + " ",
+                    "vous " + verb.getSecondPlural() + " ");
         }
+
+        // Remplacer les cas généraux de conjugaison
         processedText = processedText
+                .replaceAll("[Jj]e ([a-z]*)e ", "vous $1ez ")
                 .replaceAll("[Jj]e ([a-z]*)s ", "vous $1ssez ")
                 .replace("mon ", "votre ")
                 .replace("ma ", "votre ")
                 .replace("mes ", "vos ")
                 .replace("moi", "vous");
+
         return processedText;
     }
 
@@ -132,124 +121,18 @@ public class MessageProcessor {
      * @return The response (String).
      */
     public String generateResponse(final String input) {
+        List<IResponseRule> responseRules = loadRulesFromConfig(
+                "responseRules.properties");
+
         for (IResponseRule rule : responseRules) {
             if (rule.appliesTo(input, this)) {
                 return rule.generateResponse(input, this);
             }
         }
-        // Réponse par défaut si aucune règle ne s'applique
-        return getDefaultResponse();
+
+        return null;
     }
-
-    /*
-     * public String generateResponse(final String normalizedText) {
-     * Matcher matcher;
-     * String response;
-     * 
-     * matcher = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
-     * .matcher(normalizedText);
-     * if (matcher.matches()) {
-     * name = (matcher.group(1));
-     * return "Bonjour " + matcher.group(1) + ".";
-     * }
-     * matcher = Pattern.compile("Quel est mon nom \\?", Pattern.CASE_INSENSITIVE)
-     * .matcher(normalizedText);
-     * if (matcher.matches()) {
-     * if (name != null) {
-     * response = "Votre nom est " + name + ".";
-     * } else {
-     * response = "Je ne connais pas votre nom.";
-     * }
-     * return response;
-     * }
-     * 
-     * matcher = Pattern.compile("Qui est le plus (.*) \\?",
-     * Pattern.CASE_INSENSITIVE)
-     * .matcher(normalizedText);
-     * if (matcher.matches()) {
-     * response = "Le plus " + matcher.group(1) +
-     * " est bien sûr votre enseignant de MIF01 !";
-     * return response;
-     * }
-     * 
-     * matcher = Pattern.compile("(Je .*)\\.",
-     * Pattern.CASE_INSENSITIVE).matcher(normalizedText);
-     * if (matcher.matches()) {
-     * String startQuestion = pickRandom(new String[] {
-     * "Pourquoi dites-vous que ",
-     * "Pourquoi pensez-vous que ",
-     * "Êtes-vous sûr que ",
-     * });
-     * response = startQuestion + firstToSecondPerson(matcher.group(1)) + " ?";
-     * return response;
-     * }
-     * 
-     * matcher = Pattern.compile(".*\\?$",
-     * Pattern.CASE_INSENSITIVE).matcher(normalizedText);
-     * if (matcher.matches()) {
-     * String startQuestion = pickRandom(new String[] {
-     * "Je vous renvoie la question.",
-     * "Ici, c'est moi qui pose les questions."
-     * });
-     * response = startQuestion;
-     * return response;
-     * }
-     * 
-     * // Matches "Au revoir"
-     * matcher = Pattern.compile("(?i)^au revoir\\.$", Pattern.CASE_INSENSITIVE)
-     * .matcher(normalizedText);
-     * if (matcher.matches()) {
-     * String str1 = "Au revoir";
-     * String str2 = "Oh non, c'est trop triste de se quitter !";
-     * if (getName() != null) {
-     * str1 += " " + getName() + ".";
-     * str2 = "Bon débarras, n'oublie pas de commit + push avant de partir "
-     * + getName() + ".";
-     * }
-     * String startQuestion = pickRandom(new String[] {
-     * str1,
-     * str2
-     * });
-     * response = startQuestion;
-     * return response;
-     * }
-     * 
-     * // Random responses
-     * String[] randomResponses = {
-     * "Il fait beau aujourd'hui, vous ne trouvez pas ?",
-     * "Je ne comprends pas.",
-     * "Hmmm, hmm ..."
-     * };
-     * for (String randomResponse : randomResponses) {
-     * if (getRandom().nextBoolean()) {
-     * response = randomResponse;
-     * return response;
-     * }
-     * }
-     * 
-     * // Default answer
-     * if (name != null) {
-     * response = "Qu'est-ce qui vous fait dire cela, " + name + " ?";
-     * } else {
-     * response = "Qu'est-ce qui vous fait dire cela ?";
-     * }
-     * return response;
-     * }
-     */
-
-    /**
-     * Generate a response to the input text.
-     * 
-     */
-    private String getDefaultResponse() {
-        // Implémentation de la logique de réponse par défaut
-        if (name != null) {
-            return "Qu'est-ce qui vous fait dire cela, " + name + " ?";
-        } else {
-            return "Qu'est-ce qui vous fait dire cela ?";
-        }
-    }
-
+    
     /** Pick an element randomly in the array. */
     public <T> T pickRandom(final T[] array) {
         return array[random.nextInt(array.length)];
