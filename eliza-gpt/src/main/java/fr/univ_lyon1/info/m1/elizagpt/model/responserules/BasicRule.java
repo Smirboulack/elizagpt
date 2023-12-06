@@ -20,9 +20,8 @@ public class BasicRule implements IResponseRule {
      */
     @Override
     public boolean appliesTo(final String input, final MessageProcessor processor) {
-        return Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE)
-                .matcher(processor.normalize(input))
-                .matches();
+        return Pattern.compile("(Je .*)", Pattern.CASE_INSENSITIVE)
+                .matcher(input).matches();
     }
 
     /**
@@ -34,8 +33,8 @@ public class BasicRule implements IResponseRule {
      */
     @Override
     public String generateResponse(final String input, final MessageProcessor processor) {
-        Matcher matcher = Pattern.compile("(Je .*)\\.", Pattern.CASE_INSENSITIVE)
-                .matcher(processor.normalize(input));
+        Matcher matcher = Pattern.compile("(Je .*)", Pattern.CASE_INSENSITIVE)
+                .matcher(input);
         if (matcher.matches()) {
             String startQuestion = processor.pickRandom(new String[] {
                     "Pourquoi dites-vous que ",
@@ -43,7 +42,7 @@ public class BasicRule implements IResponseRule {
                     "Êtes-vous sûr que ",
             });
             try {
-                return startQuestion + processor.firstToSecondPerson(matcher.group(1)) + " ?";
+                return startQuestion + processor.firstToSecondPerson(matcher.group(1) + " ?");
             } catch (CsvValidationException e) {
                 e.printStackTrace();
             }

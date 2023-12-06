@@ -46,8 +46,7 @@ public class MessageProcessor {
         // Charger le fichier properties à partir du classpath
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(configFilePath)) {
             if (input == null) {
-                throw 
-                new FileNotFoundException("Fichier de configuration non trouvé dans le classpath");
+                throw new FileNotFoundException("Fichier de configuration non trouvé dans le classpath");
             }
 
             props.load(input);
@@ -59,8 +58,7 @@ public class MessageProcessor {
                     String fullClassName = "fr.univ_lyon1.info.m1.elizagpt.model.responserules."
                             + className.trim();
                     Class<?> clazz = Class.forName(fullClassName);
-                    IResponseRule rule =
-                     (IResponseRule) clazz.getDeclaredConstructor().newInstance();
+                    IResponseRule rule = (IResponseRule) clazz.getDeclaredConstructor().newInstance();
                     rules.add(rule);
                 } catch (ClassNotFoundException e) {
                     System.err.println("La classe " + className.trim() + " n'a pas été trouvée.");
@@ -100,21 +98,18 @@ public class MessageProcessor {
      * @throws CsvValidationException
      */
     public String firstToSecondPerson(final String text) throws CsvValidationException {
-        System.out.println("hello ");
-        String processedText = text
-                .replaceAll("[Jj]e ([a-z]*)e ", "vous $1ez ");
+        String processedText = text;
+        System.out.println("premiere affiche : " + processedText);
 
         for (Verb verb : VerbList.getVerbs()) {
-            /* System.out.print(verb.getFirstSingular());
-            System.out.print(" ");
-            System.out.println(verb.getSecondPlural()); */
             processedText = processedText.replaceAll(
                     "[Jj]e " + verb.getFirstSingular(),
                     "vous " + verb.getSecondPlural());
 
         }
+
+        System.out.println("firstToSecondPerson: " + processedText);
         processedText = processedText
-                .replaceAll("[Jj]e ([a-z]*)s ", "vous $1ssez ")
                 .replace("mon ", "votre ")
                 .replace("ma ", "votre ")
                 .replace("mes ", "vos ")

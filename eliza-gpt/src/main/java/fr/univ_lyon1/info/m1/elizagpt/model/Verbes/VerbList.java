@@ -55,9 +55,6 @@ public class VerbList {
             String[] nextRecord;
             while ((nextRecord = csvReader.readNext()) != null) {
                 Verb verb = new Verb(nextRecord[5], nextRecord[9]);
-                System.out.print(nextRecord[5]);
-                System.out.print(" ");
-                System.out.println(nextRecord[9]);
                 verbs.add(verb);
             }
         } catch (IOException e) {

@@ -79,7 +79,8 @@ public class MessageController {
      */
     public void processUserInput(final String input) {
 
-        String response = model.generateResponse(model.normalize(input));
+        //String response = model.generateResponse(model.normalize(input));
+        String response = model.generateResponse(input);
         // create random string id
         String messageIdUser = String.valueOf(model.getRandom().nextInt());
         String messageIdEliza = String.valueOf(model.getRandom().nextInt());
