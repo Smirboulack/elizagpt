@@ -20,8 +20,13 @@ public class BasicRule implements IResponseRule {
      */
     @Override
     public boolean appliesTo(final String input, final MessageProcessor processor) {
-        return Pattern.compile("(Je .*)", Pattern.CASE_INSENSITIVE)
+        boolean pattern1 = Pattern.compile("(Je .*)", Pattern.CASE_INSENSITIVE)
                 .matcher(input).matches();
+        boolean pattern2 = Pattern.compile("(J\'.*)", Pattern.CASE_INSENSITIVE)
+                .matcher(input).matches();
+        boolean pattern3 = Pattern.compile("(Mm\'.*)", Pattern.CASE_INSENSITIVE)
+                .matcher(input).matches();
+        return pattern1 || pattern2 || pattern3;
     }
 
     /**
@@ -33,20 +38,17 @@ public class BasicRule implements IResponseRule {
      */
     @Override
     public String generateResponse(final String input, final MessageProcessor processor) {
-        Matcher matcher = Pattern.compile("(Je .*)", Pattern.CASE_INSENSITIVE)
-                .matcher(input);
-        if (matcher.matches()) {
-            String startQuestion = processor.pickRandom(new String[] {
-                    "Pourquoi dites-vous que ",
-                    "Pourquoi pensez-vous que ",
-                    "Êtes-vous sûr que ",
-            });
-            try {
-                return startQuestion + processor.firstToSecondPerson(matcher.group() + " ?");
-            } catch (CsvValidationException e) {
-                e.printStackTrace();
-            }
+        String startQuestion = processor.pickRandom(new String[] {
+                "Pourquoi dites-vous que ",
+                "Pourquoi pensez-vous que ",
+                "Êtes-vous sûr que ",
+        });
+        try {
+            return startQuestion + processor.firstToSecondPerson(input) + " ?";
+        } catch (CsvValidationException e) {
+            e.printStackTrace();
         }
+
         return null;
     }
 }

@@ -23,6 +23,7 @@ public class MessageProcessor {
     private String name;
     private final Random random = new Random();
     private VerbList verbList;
+    List<IResponseRule> responseRules;
 
     /**
      * Constructor.
@@ -30,6 +31,8 @@ public class MessageProcessor {
     public MessageProcessor() {
         try {
             verbList = new VerbList();
+            responseRules = loadRulesFromConfig(
+                    "responseRules.properties");
         } catch (CsvValidationException e) {
             e.printStackTrace();
         }
@@ -98,28 +101,10 @@ public class MessageProcessor {
      */
     public String firstToSecondPerson(final String text) throws CsvValidationException {
         String processedText = text;
-        System.out.println("premiere affiche : " + processedText);
 
-        for (Verb verb : VerbList.getVerbs()) {
-            /*
-             * processedText = processedText.replaceAll(
-             * "[Jj]e " + verb.getFirstSingular(),
-             * "vous " + verb.getSecondPlural());
-             */
-            processedText = processedText.replaceAll("[Jj]e ", "vous ");
-            processedText = processedText.replaceAll("\\b" + verb.getFirstSingular() + "\\b", verb.getSecondPlural());
-
-        }
-
-        System.out.println("taille de la liste des verbes : " + VerbList.getVerbs().size());
-
-        System.out.println("firstToSecondPerson: " + processedText);
-        processedText = processedText
-                .replaceAll("mon ", "votre ")
-                .replaceAll("ma ", "votre ")
-                .replaceAll("mes ", "vos ")
-                .replaceAll("moi", "vous")
-                .replaceAll("m'", "vous ");
+        processedText = verbList.replacePronouns(processedText);
+        processedText = verbList.replaceVerbs(processedText);
+        processedText = verbList.replacePossessives(processedText);
 
         return processedText;
     }
@@ -131,15 +116,11 @@ public class MessageProcessor {
      * @return The response (String).
      */
     public String generateResponse(final String input) {
-        List<IResponseRule> responseRules = loadRulesFromConfig(
-                "responseRules.properties");
-
         for (IResponseRule rule : responseRules) {
             if (rule.appliesTo(input, this)) {
                 return rule.generateResponse(input, this);
             }
         }
-
         return null;
     }
 

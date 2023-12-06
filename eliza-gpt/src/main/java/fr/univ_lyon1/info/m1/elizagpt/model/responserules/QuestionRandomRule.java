@@ -17,7 +17,7 @@ public class QuestionRandomRule implements IResponseRule {
      */
     @Override
     public boolean appliesTo(final String input, final MessageProcessor processor) {
-        return Pattern.compile(".*\\?$", Pattern.CASE_INSENSITIVE)
+        return Pattern.compile(".*\\?\\s*.*$", Pattern.CASE_INSENSITIVE)
                 .matcher(input)
                 .matches();
     }

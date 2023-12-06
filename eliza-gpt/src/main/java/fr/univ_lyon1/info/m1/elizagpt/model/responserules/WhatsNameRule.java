@@ -16,7 +16,7 @@ public class WhatsNameRule implements IResponseRule {
      */
     @Override
     public boolean appliesTo(final String input, final MessageProcessor processor) {
-        return Pattern.compile("Quel est mon nom \\?", Pattern.CASE_INSENSITIVE)
+        return Pattern.compile("Quel est mon nom\\s*\\?\\s*.*$", Pattern.CASE_INSENSITIVE)
                 .matcher(input)
                 .matches();
     }

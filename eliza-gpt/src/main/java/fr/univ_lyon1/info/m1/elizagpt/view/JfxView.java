@@ -1,5 +1,6 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,9 +13,14 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
@@ -34,6 +40,8 @@ public class JfxView {
     private Label searchTextLabel = null;
     private ComboBox<SearchStrategy> comboBox;
     private MessageController controller;
+    private ImageView imagePreview;
+    private File selectedImageFile;
 
     /**
      * Main class of the View (GUI) of the application.
@@ -55,8 +63,13 @@ public class JfxView {
 
         final Pane input = createInputWidget();
         root.getChildren().add(input);
-        // root.getChildren().add(this.comboBox); // Ajout de la ComboBox
         displayMessages("Bonjour", "eliza", "0");
+
+        this.imagePreview = new ImageView();
+        imagePreview.setFitHeight(100); // Hauteur de la prévisualisation
+        imagePreview.setFitWidth(100); // Largeur de la prévisualisation
+        imagePreview.setPreserveRatio(true);
+        root.getChildren().add(imagePreview); // Ajoutez-le à votre layout
 
         // Everything's ready: add it to the scene and display it
         final Scene scene = new Scene(root, width, height);
@@ -103,13 +116,9 @@ public class JfxView {
     public void displayMessages(final String message, final String author, final String messageId) {
         HBox hBox = new HBox();
         Label label = new Label(message);
-        if (author.equals("user")) {
-            label.setStyle(USER_STYLE);
-            hBox.setAlignment(Pos.BASELINE_RIGHT);
-        } else if (author.equals("eliza")) {
-            label.setStyle(ELIZA_STYLE);
-            hBox.setAlignment(Pos.BASELINE_LEFT);
-        }
+        label.setStyle(author.equals("user") ? USER_STYLE : ELIZA_STYLE);
+        hBox.setAlignment(author.equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        label.setWrapText(true);
         hBox.getChildren().add(label);
         hBoxMap.put(messageId, hBox);
         dialog.getChildren().add(hBox);
@@ -204,14 +213,14 @@ public class JfxView {
 
         // Configuration du ComboBox
         comboBox.getSelectionModel()
-        .selectedItemProperty()
-        .addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                controller.changeSearchStrategy(newValue);
-            }
-        });
+                .selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    if (newValue != null) {
+                        controller.changeSearchStrategy(newValue);
+                    }
+                });
 
-        firstLine.getChildren().addAll(searchText, comboBox); // Ajoutez la ComboBox ici
+        firstLine.getChildren().addAll(searchText, comboBox);
 
         final Button send = new Button("Search");
         send.setOnAction(e -> {
@@ -235,18 +244,54 @@ public class JfxView {
      * Create the input widget.
      */
     private Pane createInputWidget() {
-        final Pane input = new HBox();
+        final HBox input = new HBox(10); // Espace entre les composants
+
         text = new TextField();
         text.setOnAction(e -> {
             controller.processUserInput(text.getText());
             this.text.setText("");
         });
+
         final Button send = new Button("Send");
         send.setOnAction(e -> {
-            controller.processUserInput(text.getText());
-            this.text.setText("");
+            if (selectedImageFile != null) {
+                controller.processUserImage(selectedImageFile); // Envoyer l'image au contrôleur
+                selectedImageFile = null;
+                imagePreview.setImage(null);
+            }
+            controller.processUserInput(text.getText()); // Envoyer le texte au contrôleur
+            text.setText(""); // Réinitialiser le champ de texte
         });
-        input.getChildren().addAll(text, send);
+
+        // Création du bouton de sélection de fichier avec une icône
+        Image fileIcon = new Image("file:src/main/resources/AML_pur.png");
+        ImageView iconView = new ImageView(fileIcon);
+        iconView.setFitHeight(20);
+        iconView.setFitWidth(20);
+
+        final Button fileButton = new Button("", iconView);
+        fileButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select Image File");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("All Images", "*.*"),
+                    new FileChooser.ExtensionFilter("JPG", "*.jpg"),
+                    new FileChooser.ExtensionFilter("PNG", "*.png"),
+                    new FileChooser.ExtensionFilter("GIF", "*.gif"),
+                    new FileChooser.ExtensionFilter("BMP", "*.bmp"),
+                    new FileChooser.ExtensionFilter("JPEG", "*.jpeg"),
+                    new FileChooser.ExtensionFilter("SVG", "*.svg")
+
+            );
+            File file = fileChooser.showOpenDialog(new Stage());
+            if (file != null) {
+                selectedImageFile = file; // Stockez la référence du fichier
+                Image image = new Image(file.toURI().toString());
+                imagePreview.setImage(image); // Affichez la prévisualisation
+            }
+        });
+
+        input.getChildren().addAll(text, send, fileButton);
         return input;
     }
 

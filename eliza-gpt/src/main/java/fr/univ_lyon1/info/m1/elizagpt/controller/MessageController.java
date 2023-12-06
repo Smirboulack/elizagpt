@@ -2,6 +2,7 @@ package fr.univ_lyon1.info.m1.elizagpt.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
 
 import fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy.SearchStrategy;
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
@@ -78,9 +79,10 @@ public class MessageController {
      * @param input
      */
     public void processUserInput(final String input) {
-
-        //String response = model.generateResponse(model.normalize(input));
-        String response = model.generateResponse(input);
+        if(input == null || input.isEmpty()) {
+            return;
+        }
+        String response = model.generateResponse(model.normalize(input));
         // create random string id
         String messageIdUser = String.valueOf(model.getRandom().nextInt());
         String messageIdEliza = String.valueOf(model.getRandom().nextInt());
@@ -89,6 +91,21 @@ public class MessageController {
             v.displayMessages(response, "eliza", messageIdEliza);
         }
     }
+
+    public void processUserImage(File imageFile) {
+        if(imageFile == null) {
+            return;
+        }
+        String response = model.generateResponse(model.normalize(imageFile.getName()));
+        // create random string id
+        String messageIdUser = String.valueOf(model.getRandom().nextInt());
+        String messageIdEliza = String.valueOf(model.getRandom().nextInt());
+        for (JfxView v : views) {
+            v.displayMessages(imageFile.getName(), "user", messageIdUser);
+            v.displayMessages(response, "eliza", messageIdEliza);
+        }
+    }
+    
 
     /**
      * Process the receveid message.
