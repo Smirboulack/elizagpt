@@ -31,7 +31,6 @@ public class MessageProcessor {
         try {
             verbList = new VerbList();
         } catch (CsvValidationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -102,19 +101,25 @@ public class MessageProcessor {
         System.out.println("premiere affiche : " + processedText);
 
         for (Verb verb : VerbList.getVerbs()) {
-            processedText = processedText.replaceAll(
-                    "[Jj]e " + verb.getFirstSingular(),
-                    "vous " + verb.getSecondPlural());
+            /*
+             * processedText = processedText.replaceAll(
+             * "[Jj]e " + verb.getFirstSingular(),
+             * "vous " + verb.getSecondPlural());
+             */
+            processedText = processedText.replaceAll("[Jj]e ", "vous ");
+            processedText = processedText.replaceAll("\\b" + verb.getFirstSingular() + "\\b", verb.getSecondPlural());
 
         }
 
+        System.out.println("taille de la liste des verbes : " + VerbList.getVerbs().size());
+
         System.out.println("firstToSecondPerson: " + processedText);
         processedText = processedText
-                .replace("mon ", "votre ")
-                .replace("ma ", "votre ")
-                .replace("mes ", "vos ")
-                .replace("moi", "vous")
-                .replace("m'", "vous ");
+                .replaceAll("mon ", "votre ")
+                .replaceAll("ma ", "votre ")
+                .replaceAll("mes ", "vos ")
+                .replaceAll("moi", "vous")
+                .replaceAll("m'", "vous ");
 
         return processedText;
     }

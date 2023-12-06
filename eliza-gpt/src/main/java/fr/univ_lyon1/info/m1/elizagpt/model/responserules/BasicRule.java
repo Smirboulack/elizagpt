@@ -42,7 +42,7 @@ public class BasicRule implements IResponseRule {
                     "Êtes-vous sûr que ",
             });
             try {
-                return startQuestion + processor.firstToSecondPerson(matcher.group(1) + " ?");
+                return startQuestion + processor.firstToSecondPerson(matcher.group() + " ?");
             } catch (CsvValidationException e) {
                 e.printStackTrace();
             }

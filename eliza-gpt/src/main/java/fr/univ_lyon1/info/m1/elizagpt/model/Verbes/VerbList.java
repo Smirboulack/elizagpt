@@ -51,13 +51,23 @@ public class VerbList {
 
     private void loadVerbsFromCSV(final String filePath) throws CsvValidationException {
         try (Reader reader = new FileReader(filePath);
-                CSVReader csvReader = new CSVReader(reader);) {
+                CSVReader csvReader = new CSVReader(reader)) {
+
             String[] nextRecord;
             while ((nextRecord = csvReader.readNext()) != null) {
-                Verb verb = new Verb(nextRecord[5], nextRecord[9]);
-                verbs.add(verb);
+                if (nextRecord.length > 9) { // Vérifiez si la ligne a suffisamment de colonnes
+                    String firstSingular = nextRecord[5]; // Supposons que c'est la forme au premier singulier
+                    String secondPlural = nextRecord[9]; // Supposons que c'est la forme au second pluriel
+                    Verb verb = new Verb(firstSingular, secondPlural);
+                    verbs.add(verb);
+                } else {
+                    // Gérez le cas où il n'y a pas assez de données dans la ligne
+                    // Par exemple, enregistrer un avertissement ou ignorer la ligne
+                }
             }
         } catch (IOException e) {
+            // Gérez l'exception ici, par exemple en l'enregistrant ou en la propageant
+            throw new RuntimeException("Erreur lors de la lecture du fichier CSV: " + filePath, e);
         }
     }
 
