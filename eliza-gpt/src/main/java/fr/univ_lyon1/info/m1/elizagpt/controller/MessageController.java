@@ -14,6 +14,8 @@ import fr.univ_lyon1.info.m1.elizagpt.view.ChatMessage;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 /**
  * Main class of the controller.
@@ -118,14 +120,31 @@ public class MessageController {
      * 
      * @param message
      */
-    public void deleteMessageViews(final ChatMessage message) {
-        for (JfxView v : views) {
-            v.getDialog()
-                    .getChildren()
-                    .removeIf(node -> node.getId().equals(Integer.toString(message.getId())));
-            v.removeMessage(message);
+public void deleteMessageViews(final ChatMessage message) {
+    for (JfxView v : views) {
+        // Supprimer le messageContainer de dialog
+        v.getDialog().getChildren().removeIf(node -> {
+            if (node instanceof VBox) {
+                VBox messageContainer = (VBox) node;
+                if (!messageContainer.getChildren().isEmpty() 
+                && messageContainer.getChildren().get(1) instanceof HBox) {
+                    HBox container = (HBox) messageContainer.getChildren().get(1);
+                    return container.getId().equals(Integer.toString(message.getId()));
+                }
+            }
+            return false;
+        });
+
+        // Supprimer le message de la liste des messages
+        v.removeMessage(message);
+
+        // Si l'état du chat est sauvegardé, supprimer le message de la liste sauvegardée
+        if (this.isChatStateSaved) {
+            v.getMessagesSaved().removeIf(m -> m.getId() == message.getId());
         }
     }
+}
+
 
     /**
      * Save the current chat state.

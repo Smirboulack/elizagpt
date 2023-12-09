@@ -152,6 +152,8 @@ public class JfxView {
         }
     }
 
+    
+
     /*
      * public void displayMessages() {
      * dialog.getChildren().clear();
