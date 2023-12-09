@@ -2,10 +2,10 @@ package fr.univ_lyon1.info.m1.elizagpt.view;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
+import fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy.SearchStrategy;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,26 +20,23 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import fr.univ_lyon1.info.m1.elizagpt.controller.MessageController;
-import fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy.SearchStrategy;
-
 import javafx.util.StringConverter;
 
 /**
  * Main class of the View (GUI) of the application.
  */
 public class JfxView {
-    private final VBox dialog;
-    private final Map<String, HBox> hBoxMap = new HashMap<>();
-    private List<HBox> chatHistory;
+    private VBox dialog;
+    private List<ChatMessage> messages = new ArrayList<>();
+    private List<ChatMessage> messagesSaved = new ArrayList<>();
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
-    private final ComboBox<SearchStrategy> comboBox;
+    private ComboBox<SearchStrategy> comboBox;
     private MessageController controller;
-    private final ImageView imagePreview;
+    private ImageView imagePreview;
     private File selectedImageFile;
+    private final Image trashImage;
 
     /**
      * Main class of the View (GUI) of the application.
@@ -54,6 +51,7 @@ public class JfxView {
         ScrollPane dialogScroll = new ScrollPane();
         dialog = new VBox(10);
         dialogScroll.setContent(dialog);
+
         // scroll to bottom by default:
         dialogScroll.vvalueProperty().bind(dialog.heightProperty());
         root.getChildren().add(dialogScroll);
@@ -61,13 +59,15 @@ public class JfxView {
 
         final Pane input = createInputWidget();
         root.getChildren().add(input);
-        displayMessages("Bonjour", "eliza", "0");
+        this.trashImage = new Image("file:src/main/resources/trash.png");
+        this.messages.add(new ChatMessage(1, "Bonjour.", "eliza", "now", ChatMessage.ELIZA_STYLE));
+        this.displayMessages();
 
         this.imagePreview = new ImageView();
-        imagePreview.setFitHeight(100); // Hauteur de la prévisualisation
-        imagePreview.setFitWidth(100); // Largeur de la prévisualisation
+        imagePreview.setFitHeight(100);
+        imagePreview.setFitWidth(100);
         imagePreview.setPreserveRatio(true);
-        root.getChildren().add(imagePreview); // Ajoutez-le à votre layout
+        root.getChildren().add(imagePreview);
 
         // Everything's ready: add it to the scene and display it
         final Scene scene = new Scene(root, width, height);
@@ -79,7 +79,7 @@ public class JfxView {
     /**
      * Set the controller of the view.
      * 
-     * @param controller the cotroller
+     * @param controller
      */
     public void setController(final MessageController controller) {
         this.controller = controller;
@@ -102,28 +102,75 @@ public class JfxView {
         comboBox.getSelectionModel().selectFirst();
     }
 
-    static final String BASE_STYLE = "-fx-padding: 8px; "
-            + "-fx-margin: 5px; "
-            + "-fx-background-radius: 5px;";
-    static final String USER_STYLE = "-fx-background-color: #A0E0A0; " + BASE_STYLE;
-    static final String ELIZA_STYLE = "-fx-background-color: #A0A0E0; " + BASE_STYLE;
+    public void displayMessages() {
+        dialog.getChildren().clear();
+        for (ChatMessage message : messages) {
+            // HBox pour le message
+            HBox outerHBox = new HBox();
+            outerHBox.setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
-    /**
-     * Display a message according to its author.
-     */
-    public void displayMessages(final String message, final String author, final String messageId) {
-        HBox hBox = new HBox();
-        Label label = new Label(message);
-        label.setStyle(author.equals("user") ? USER_STYLE : ELIZA_STYLE);
-        hBox.setAlignment(author.equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-        label.setWrapText(true);
-        hBox.getChildren().add(label);
-        hBoxMap.put(messageId, hBox);
-        dialog.getChildren().add(hBox);
-        hBox.setOnMouseClicked(e -> {
-            controller.deleteMessageViews(messageId);
-        });
+            // Style et contenu du message
+            HBox innerHBox = new HBox(5.0);
+            innerHBox.setStyle(message.getStyle());
+            Label messageLabel = new Label(message.getText());
+            messageLabel.setWrapText(true);
+            innerHBox.getChildren().add(messageLabel);
+
+            // Ajouter le message à la outerHBox
+            outerHBox.getChildren().add(innerHBox);
+
+            // Bouton de suppression avec icône de poubelle
+            ImageView trashView = new ImageView(trashImage);
+            trashView.setFitHeight(25);
+            trashView.setFitWidth(25);
+            Button deleteButton = new Button();
+            deleteButton.setGraphic(trashView);
+            deleteButton.setOnAction(event -> {
+                controller.deleteMessageViews(message);
+            });
+
+            // HBox parente pour contenir le message et le bouton de suppression
+            HBox container = new HBox(5); // 5 est l'espacement entre les éléments
+            container.setId(Integer.toString(message.getId()));
+            container.getChildren().addAll(outerHBox, deleteButton);
+            container.setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+            // Ajouter le container à dialog
+            dialog.getChildren().add(container);
+        }
     }
+
+    /* public void displayMessages() {
+        dialog.getChildren().clear();
+        for (ChatMessage message : messages) {
+            HBox outerHBox = new HBox();
+            String idMessage = Integer.toString(message.getId());
+            outerHBox.setId(idMessage);
+            outerHBox.setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+            HBox innerHBox = new HBox(5.0);
+            innerHBox.setStyle(message.getStyle());
+
+            Label messageLabel = new Label(message.getText());
+            messageLabel.setWrapText(true);
+            ImageView trashView = new ImageView(trashImage);
+            trashView.setFitHeight(20);
+            trashView.setFitWidth(20);
+            
+
+            Button deleteButton = new Button();
+            deleteButton.setGraphic(trashView);
+
+            deleteButton.setOnAction(event -> {
+                controller.deleteMessageViews(message);
+            });
+
+            innerHBox.getChildren().addAll(messageLabel, deleteButton);
+            outerHBox.getChildren().add(innerHBox);
+            dialog.getChildren().add(outerHBox);
+        }
+    } */
+
 
     /**
      * Return the search text field.
@@ -134,10 +181,14 @@ public class JfxView {
         return searchText;
     }
 
+    public void removeMessage(final ChatMessage message) {
+        messages.removeIf(m -> m.getId() == message.getId());
+    }
+
     /**
      * Update the text of the search label.
      * 
-     * @param text the text to search
+     * @param text
      */
     public void updateSearchLabel(final String text) {
         searchTextLabel.setText(text);
@@ -146,7 +197,7 @@ public class JfxView {
     /**
      * Return the search text label.
      * 
-     * @return Label the SearchTextLabel
+     * @return
      */
     public Label getSearchTextLabel() {
         return searchTextLabel;
@@ -176,33 +227,37 @@ public class JfxView {
     /**
      * Return the dialog.
      * 
-     * @return la Vbox dialog
+     * @return
      */
     public VBox getDialog() {
         return dialog;
     }
 
-    /**
-     * return the chatHistory.
-     */
-    public List<HBox> getChatHistory() {
-        return this.chatHistory;
+    public void setDialog(final VBox dialog) {
+        this.dialog = dialog;
     }
 
-    /**
-     * Set the chatHistory.
-     *
-     * @param chatHistory l'historique du chat
-     */
-    public void setChatHistory(final List<HBox> chatHistory) {
-        this.chatHistory = new ArrayList<>(chatHistory);
+    public List<ChatMessage> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(final List<ChatMessage> messages) {
+        this.messages = messages;
+    }
+
+    public List<ChatMessage> getMessagesSaved() {
+        return messagesSaved;
+    }
+
+    public void setMessagesSaved(final List<ChatMessage> messagesSaved) {
+        this.messagesSaved = messagesSaved;
     }
 
     /**
      * Create the search widget.
      */
     private Pane createSearchWidget() {
-        final HBox firstLine = new HBox(10); // Le chiffre indique l'espace entre les éléments
+        final HBox firstLine = new HBox(10);
 
         searchText = new TextField();
         searchText.setOnAction(e -> {
@@ -253,12 +308,12 @@ public class JfxView {
         final Button send = new Button("Send");
         send.setOnAction(e -> {
             if (selectedImageFile != null) {
-                controller.processUserImage(selectedImageFile); // Envoyer l'image au contrôleur
+                controller.processUserImage(selectedImageFile);
                 selectedImageFile = null;
                 imagePreview.setImage(null);
             }
-            controller.processUserInput(text.getText()); // Envoyer le texte au contrôleur
-            text.setText(""); // Réinitialiser le champ de texte
+            controller.processUserInput(text.getText());
+            text.setText("");
         });
 
         // Création du bouton de sélection de fichier avec une icône
@@ -283,17 +338,13 @@ public class JfxView {
             );
             File file = fileChooser.showOpenDialog(new Stage());
             if (file != null) {
-                selectedImageFile = file; // Stockez la référence du fichier
+                selectedImageFile = file;
                 Image image = new Image(file.toURI().toString());
-                imagePreview.setImage(image); // Affichez la prévisualisation
+                imagePreview.setImage(image);
             }
         });
 
         input.getChildren().addAll(text, send, fileButton);
         return input;
-    }
-
-    public Map<String, HBox> getHBoxMap() {
-        return hBoxMap;
     }
 }

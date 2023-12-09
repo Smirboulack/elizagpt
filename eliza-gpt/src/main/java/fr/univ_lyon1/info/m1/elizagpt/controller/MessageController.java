@@ -1,36 +1,35 @@
 package fr.univ_lyon1.info.m1.elizagpt.controller;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.time.DateUtils;
+import org.reflections.Reflections;
 
 import fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy.SearchStrategy;
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+import fr.univ_lyon1.info.m1.elizagpt.view.ChatMessage;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
-import java.util.stream.Collectors;
-import org.reflections.Reflections;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import java.util.Set;
 
 /**
  * Main class of the controller.
  */
 public class MessageController {
-    private final MessageProcessor model;
-    private final List<JfxView> views;
-    private final ObservableList<SearchStrategy> listeObservable
-            = FXCollections.observableArrayList();
+    private MessageProcessor model;
+    private List<JfxView> views;
+    private ObservableList<SearchStrategy> listeObservable = FXCollections.observableArrayList();
     private SearchStrategy currentSearchStrategy;
+    private boolean isChatStateSaved = false;
 
     /**
      * Constructor.
      * 
-     * @param view la vue
+     * @param view
      */
     public MessageController(final List<JfxView> view) {
         this.model = new MessageProcessor();
@@ -45,10 +44,8 @@ public class MessageController {
      * Load all the search strategies.
      */
     public void chargerStrategies() {
-        Reflections reflections = 
-        new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
-        Set<Class<? extends SearchStrategy>> classes = 
-        reflections.getSubTypesOf(SearchStrategy.class);
+        Reflections reflections = new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
+        Set<Class<? extends SearchStrategy>> classes = reflections.getSubTypesOf(SearchStrategy.class);
 
         for (Class<? extends SearchStrategy> classe : classes) {
             try {
@@ -63,7 +60,7 @@ public class MessageController {
     /**
      * Change the current search strategy.
      * 
-     * @param newValue la nouvelle méthode de recherche
+     * @param newValue
      */
     public void changeSearchStrategy(final SearchStrategy newValue) {
         this.currentSearchStrategy = newValue;
@@ -77,27 +74,27 @@ public class MessageController {
      * Process the sended message, generate a response and call the view to display
      * it.
      * 
-     * @param input le message à envoyer
+     * @param input
      */
     public void processUserInput(final String input) {
         if (input == null || input.isEmpty()) {
             return;
         }
-        String response = model.generateResponse(model.normalize(input));
-        // create random string id
-        String messageIdUser = String.valueOf(model.getRandom().nextInt());
-        String messageIdEliza = String.valueOf(model.getRandom().nextInt());
+        int idu = model.getRandom().nextInt();
+        int ide = model.getRandom().nextInt();
+        ChatMessage message = new ChatMessage(idu, input, "user",
+                DateUtils.addSeconds(new java.util.Date(), 0).toString(),
+                ChatMessage.USER_STYLE);
+        ChatMessage response = new ChatMessage(ide, model.generateResponse(model.normalize(input)), "eliza",
+                DateUtils.addSeconds(new java.util.Date(), 0).toString(), ChatMessage.ELIZA_STYLE);
         for (JfxView v : views) {
-            v.displayMessages(input, "user", messageIdUser);
-            v.displayMessages(response, "eliza", messageIdEliza);
+            v.getMessages().add(message);
+            v.getMessages().add(response);
+            v.displayMessages();
         }
     }
 
-    /**.
-     * Procédure permettant d'envoyer une image
-     */
-
-    public void processUserImage(final File imageFile) {
+    public void processUserImage(File imageFile) {
         if (imageFile == null) {
             return;
         }
@@ -106,96 +103,59 @@ public class MessageController {
         String messageIdUser = String.valueOf(model.getRandom().nextInt());
         String messageIdEliza = String.valueOf(model.getRandom().nextInt());
         for (JfxView v : views) {
-            v.displayMessages(imageFile.getName(), "user", messageIdUser);
-            v.displayMessages(response, "eliza", messageIdEliza);
+            // v.displayMessages(imageFile, "user", messageIdUser);
+            // v.displayMessages(response, "eliza", messageIdEliza);
         }
     }
-    
 
     /**
      * Process the receveid message.
      * 
-     * @param messageId the ID's message
+     * @param messageId
      */
-    public void deleteMessageViews(final String messageId) {
+    public void deleteMessageViews(final ChatMessage message) {
         for (JfxView v : views) {
-            HBox hBox = v.getHBoxMap().get(messageId);
-            if (hBox != null) {
-                v.getDialog().getChildren().remove(hBox);
-                v.getHBoxMap().remove(messageId);
-            }
-            if (v.getChatHistory() != null) {
-                v.getChatHistory().remove(hBox);
-            }
+            v.getDialog().getChildren().removeIf(node -> node.getId().equals(Integer.toString(message.getId())));
+            v.removeMessage(message);
         }
     }
 
     /**
-     * Save the current state of the chat.
+     * Save the current chat state.
      */
     public void saveChatState() {
-        for (JfxView jfxView : views) {
-            jfxView.setChatHistory(new ArrayList<>(jfxView.getDialog().getChildren().stream()
-                    .filter(node -> node instanceof HBox)
-                    .map(node -> (HBox) node)
-                    .collect(Collectors.toList())));
+        if (isChatStateSaved) {
+            return;
         }
-    }
-
-    /**
-     * Search for a text in the chat.
-     */
-    public void searchText(final String text) {
-        saveChatState(); // On sauvegarde l'état actuel du Chat.
         for (JfxView view : views) {
-            view.getSearchText().setText(text);
-            String currentSearchText = view.getSearchText().getText();
-            if (currentSearchText == null || currentSearchText.isEmpty()) {
-                view.getSearchTextLabel().setText("No active search");
-            } else {
-                view.getSearchTextLabel().setText("Searching for: " + currentSearchText);
-            }
+            view.setMessagesSaved(new ArrayList<>(view.getMessages()));
+        }
+        isChatStateSaved = true;
+    }
 
-            List<HBox> toDelete = new ArrayList<>();
-            for (Node hBox : view.getDialog().getChildren()) {
-                for (Node label : ((HBox) hBox).getChildren()) {
-                    String labelText = ((Label) label).getText();
-                    if (labelText != null && !labelText.isEmpty()) {
-                        if (!currentSearchStrategy.search(labelText, currentSearchText)) {
-                            toDelete.add((HBox) hBox);
-                        }
-                    }
-                }
-            }
-            view.getDialog().getChildren().removeAll(toDelete);
+    public void searchText(String text) {
+        if (text == null || text.isEmpty() || currentSearchStrategy == null) {
+            return;
+        }
+        saveChatState();
+        for (JfxView view : views) {
+            List<ChatMessage> filteredMessages = view.getMessages().stream()
+                    .filter(m -> currentSearchStrategy.search(m.getText(), text))
+                    .collect(Collectors.toList());
+            view.setMessages(filteredMessages);
+            view.displayMessages();
         }
     }
 
-    /**
-     * Remove a HBox from the ChatHistory.
-     */
-    public void removeHBox(final HBox hBox) {
-        for (JfxView jfxView : views) {
-            jfxView.getChatHistory().remove(hBox);
-        }
-    }
-
-    /**
-     * Undo the search.
-     */
     public void undoSearch() {
-        // On restaure l'état original de la vue
-        for (JfxView jfxView : views) {
-            if (jfxView.getChatHistory() != null) {
-                jfxView.getDialog().getChildren().clear();
-                jfxView.getSearchTextLabel().setText("");
-                jfxView.getDialog().getChildren().addAll(jfxView.getChatHistory());
-            }
-            jfxView.getSearchText().setText("");
+        if (!isChatStateSaved) {
+            return;
         }
-
+        for (JfxView view : views) {
+            view.setMessages(new ArrayList<>(view.getMessagesSaved()));
+            view.displayMessages();
+        }
+        isChatStateSaved = false;
     }
-
-    
 
 }
