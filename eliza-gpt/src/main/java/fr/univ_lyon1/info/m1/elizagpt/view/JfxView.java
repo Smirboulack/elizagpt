@@ -60,7 +60,7 @@ public class JfxView {
         final Pane input = createInputWidget();
         root.getChildren().add(input);
         this.trashImage = new Image("file:src/main/resources/trash.png");
-        this.messages.add(new ChatMessage(1, "Bonjour.", "eliza", "now", ChatMessage.ELIZA_STYLE));
+        this.messages.add(new ChatMessage(1, "Bonjour.", "eliza", "Now", ChatMessage.ELIZA_STYLE));
         this.displayMessages();
 
         this.imagePreview = new ImageView();
@@ -102,12 +102,17 @@ public class JfxView {
         comboBox.getSelectionModel().selectFirst();
     }
 
+    /**
+     * Display the messages in the dialog.
+     */
     public void displayMessages() {
         dialog.getChildren().clear();
         for (ChatMessage message : messages) {
+            Label timeLabel = new Label(message.getDate());
+            timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
+
             // HBox pour le message
             HBox outerHBox = new HBox();
-            outerHBox.setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
             // Style et contenu du message
             HBox innerHBox = new HBox(5.0);
@@ -129,48 +134,58 @@ public class JfxView {
                 controller.deleteMessageViews(message);
             });
 
-            // HBox parente pour contenir le message et le bouton de suppression
-            HBox container = new HBox(5); // 5 est l'espacement entre les éléments
+            VBox messageContainer = new VBox(2);
+            messageContainer.getChildren().add(timeLabel);
+            messageContainer.setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT
+                    : Pos.CENTER_LEFT);
+
+            HBox container = new HBox(5); // Contient le message et le bouton de suppression
             container.setId(Integer.toString(message.getId()));
             container.getChildren().addAll(outerHBox, deleteButton);
-            container.setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+            container.setAlignment(message.getAuthor()
+                    .equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
-            // Ajouter le container à dialog
-            dialog.getChildren().add(container);
+            messageContainer.getChildren().add(container);
+
+            // Ajouter le messageContainer à dialog
+            dialog.getChildren().add(messageContainer); // Ajouter messageContainer ici
         }
     }
 
-    /* public void displayMessages() {
-        dialog.getChildren().clear();
-        for (ChatMessage message : messages) {
-            HBox outerHBox = new HBox();
-            String idMessage = Integer.toString(message.getId());
-            outerHBox.setId(idMessage);
-            outerHBox.setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-
-            HBox innerHBox = new HBox(5.0);
-            innerHBox.setStyle(message.getStyle());
-
-            Label messageLabel = new Label(message.getText());
-            messageLabel.setWrapText(true);
-            ImageView trashView = new ImageView(trashImage);
-            trashView.setFitHeight(20);
-            trashView.setFitWidth(20);
-            
-
-            Button deleteButton = new Button();
-            deleteButton.setGraphic(trashView);
-
-            deleteButton.setOnAction(event -> {
-                controller.deleteMessageViews(message);
-            });
-
-            innerHBox.getChildren().addAll(messageLabel, deleteButton);
-            outerHBox.getChildren().add(innerHBox);
-            dialog.getChildren().add(outerHBox);
-        }
-    } */
-
+    /*
+     * public void displayMessages() {
+     * dialog.getChildren().clear();
+     * for (ChatMessage message : messages) {
+     * HBox outerHBox = new HBox();
+     * String idMessage = Integer.toString(message.getId());
+     * outerHBox.setId(idMessage);
+     * outerHBox
+     * .setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT :
+     * Pos.CENTER_LEFT);
+     * 
+     * HBox innerHBox = new HBox(5.0);
+     * innerHBox.setStyle(message.getStyle());
+     * 
+     * Label messageLabel = new Label(message.getText());
+     * messageLabel.setWrapText(true);
+     * ImageView trashView = new ImageView(trashImage);
+     * trashView.setFitHeight(20);
+     * trashView.setFitWidth(20);
+     * 
+     * 
+     * Button deleteButton = new Button();
+     * deleteButton.setGraphic(trashView);
+     * 
+     * deleteButton.setOnAction(event -> {
+     * controller.deleteMessageViews(message);
+     * });
+     * 
+     * innerHBox.getChildren().addAll(messageLabel, deleteButton);
+     * outerHBox.getChildren().add(innerHBox);
+     * dialog.getChildren().add(outerHBox);
+     * }
+     * }
+     */
 
     /**
      * Return the search text field.
@@ -181,6 +196,10 @@ public class JfxView {
         return searchText;
     }
 
+    /**
+     * Remove a message from the list of messages.
+     * 
+     */
     public void removeMessage(final ChatMessage message) {
         messages.removeIf(m -> m.getId() == message.getId());
     }
@@ -308,7 +327,7 @@ public class JfxView {
         final Button send = new Button("Send");
         send.setOnAction(e -> {
             if (selectedImageFile != null) {
-                controller.processUserImage(selectedImageFile);
+                // controller.processUserImage(selectedImageFile);
                 selectedImageFile = null;
                 imagePreview.setImage(null);
             }

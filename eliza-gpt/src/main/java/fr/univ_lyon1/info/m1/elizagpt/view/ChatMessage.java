@@ -1,5 +1,8 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
+/**
+ * Class representing a chat message.
+ */
 public class ChatMessage {
     private int id;
     private String text;
@@ -13,7 +16,17 @@ public class ChatMessage {
     public static final String USER_STYLE = "-fx-background-color: #A0E0A0; " + BASE_STYLE;
     public static final String ELIZA_STYLE = "-fx-background-color: #A0A0E0; " + BASE_STYLE;
 
-    public ChatMessage(final int idm, final String text, final String author, final String date, final String style) {
+    /**
+     * Constructor.
+     * 
+     * @param idm
+     * @param text
+     * @param author
+     * @param date
+     * @param style
+     */
+    public ChatMessage(final int idm, final String text, final String author, final String date, 
+    final String style) {
         this.id = idm;
         this.text = text;
         this.author = author;
@@ -29,7 +42,7 @@ public class ChatMessage {
         return text;
     }
 
-    public void setText(String text) {
+    public void setText(final String text) {
         this.text = text;
     }
 
@@ -45,18 +58,19 @@ public class ChatMessage {
         return style;
     }
 
-    public void setDate(String date) {
+    public void setDate(final String date) {
         this.date = date;
     }
 
-    public void setAuthor(String author) {
+    public void setAuthor(final String author) {
         this.author = author;
     }
 
-    public void setStyle(String style) {
+    public void setStyle(final String style) {
         this.style = style;
     }
 
+    @Override
     public String toString() {
         return author + " : " + text + " (" + date + ")";
     }

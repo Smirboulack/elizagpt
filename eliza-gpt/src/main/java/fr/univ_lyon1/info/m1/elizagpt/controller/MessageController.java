@@ -1,6 +1,5 @@
 package fr.univ_lyon1.info.m1.elizagpt.controller;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -44,8 +43,10 @@ public class MessageController {
      * Load all the search strategies.
      */
     public void chargerStrategies() {
-        Reflections reflections = new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
-        Set<Class<? extends SearchStrategy>> classes = reflections.getSubTypesOf(SearchStrategy.class);
+        Reflections reflections =
+         new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
+        Set<Class<? extends SearchStrategy>> classes = 
+        reflections.getSubTypesOf(SearchStrategy.class);
 
         for (Class<? extends SearchStrategy> classe : classes) {
             try {
@@ -85,7 +86,8 @@ public class MessageController {
         ChatMessage message = new ChatMessage(idu, input, "user",
                 DateUtils.addSeconds(new java.util.Date(), 0).toString(),
                 ChatMessage.USER_STYLE);
-        ChatMessage response = new ChatMessage(ide, model.generateResponse(model.normalize(input)), "eliza",
+        ChatMessage response = 
+        new ChatMessage(ide, model.generateResponse(model.normalize(input)), "eliza",
                 DateUtils.addSeconds(new java.util.Date(), 0).toString(), ChatMessage.ELIZA_STYLE);
         for (JfxView v : views) {
             v.getMessages().add(message);
@@ -94,28 +96,33 @@ public class MessageController {
         }
     }
 
-    public void processUserImage(File imageFile) {
-        if (imageFile == null) {
-            return;
-        }
-        String response = model.generateResponse(model.normalize(imageFile.getName()));
-        // create random string id
-        String messageIdUser = String.valueOf(model.getRandom().nextInt());
-        String messageIdEliza = String.valueOf(model.getRandom().nextInt());
-        for (JfxView v : views) {
-            // v.displayMessages(imageFile, "user", messageIdUser);
-            // v.displayMessages(response, "eliza", messageIdEliza);
-        }
-    }
+    /*
+     * public void processUserImage(final File imageFile) {
+     * if (imageFile == null) {
+     * return;
+     * }
+     * String response =
+     * model.generateResponse(model.normalize(imageFile.getName()));
+     * // create random string id
+     * String messageIdUser = String.valueOf(model.getRandom().nextInt());
+     * String messageIdEliza = String.valueOf(model.getRandom().nextInt());
+     * for (JfxView v : views) {
+     * // v.displayMessages(imageFile, "user", messageIdUser);
+     * // v.displayMessages(response, "eliza", messageIdEliza);
+     * }
+     * }
+     */
 
     /**
      * Process the receveid message.
      * 
-     * @param messageId
+     * @param message
      */
     public void deleteMessageViews(final ChatMessage message) {
         for (JfxView v : views) {
-            v.getDialog().getChildren().removeIf(node -> node.getId().equals(Integer.toString(message.getId())));
+            v.getDialog()
+                    .getChildren()
+                    .removeIf(node -> node.getId().equals(Integer.toString(message.getId())));
             v.removeMessage(message);
         }
     }
@@ -133,7 +140,12 @@ public class MessageController {
         isChatStateSaved = true;
     }
 
-    public void searchText(String text) {
+    /**
+     * Search a text in the chat.
+     * 
+     * @param text
+     */
+    public void searchText(final String text) {
         if (text == null || text.isEmpty() || currentSearchStrategy == null) {
             return;
         }
@@ -147,6 +159,9 @@ public class MessageController {
         }
     }
 
+    /**
+     * Undo the search.
+     */
     public void undoSearch() {
         if (!isChatStateSaved) {
             return;
@@ -157,5 +172,4 @@ public class MessageController {
         }
         isChatStateSaved = false;
     }
-
 }

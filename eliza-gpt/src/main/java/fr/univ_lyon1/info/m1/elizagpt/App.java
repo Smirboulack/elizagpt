@@ -23,7 +23,7 @@ public class App extends Application {
     public void start(final Stage stage) throws Exception {
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
         double width = screenBounds.getWidth() / 3.5; // Divide screen width by 3
-        double height = screenBounds.getHeight() / 3.5; // Divide screen height by 3
+        double height = screenBounds.getHeight() / 3; // Divide screen height by 3
 
         Stage stage1 = new Stage();
         Stage stage2 = new Stage();
