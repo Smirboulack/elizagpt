@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import fr.univ_lyon1.info.m1.elizagpt.model.Verbes.Verb;
 import fr.univ_lyon1.info.m1.elizagpt.model.Verbes.VerbList;
 import fr.univ_lyon1.info.m1.elizagpt.model.responserules.IResponseRule;
 
@@ -23,7 +22,7 @@ public class MessageProcessor {
     private String name;
     private final Random random = new Random();
     private VerbList verbList;
-    List<IResponseRule> responseRules;
+    private List<IResponseRule> responseRules;
 
     /**
      * Constructor.
@@ -48,7 +47,8 @@ public class MessageProcessor {
         // Charger le fichier properties à partir du classpath
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(configFilePath)) {
             if (input == null) {
-                throw new FileNotFoundException("Fichier de configuration non trouvé dans le classpath");
+                throw new FileNotFoundException(
+                        "Fichier de configuration non trouvé dans le classpath");
             }
 
             props.load(input);
@@ -60,7 +60,8 @@ public class MessageProcessor {
                     String fullClassName = "fr.univ_lyon1.info.m1.elizagpt.model.responserules."
                             + className.trim();
                     Class<?> clazz = Class.forName(fullClassName);
-                    IResponseRule rule = (IResponseRule) clazz.getDeclaredConstructor().newInstance();
+                    IResponseRule rule = (IResponseRule)
+                            clazz.getDeclaredConstructor().newInstance();
                     rules.add(rule);
                 } catch (ClassNotFoundException e) {
                     System.err.println("La classe " + className.trim() + " n'a pas été trouvée.");
@@ -79,7 +80,7 @@ public class MessageProcessor {
     /**
      * Normlize the text: remove extra spaces, add a final dot if missing.
      * 
-     * @param text
+     * @param text le texte à normalmiser
      * @return normalized text.
      */
     public String normalize(final String text) {
@@ -93,11 +94,9 @@ public class MessageProcessor {
      * Turn a 1st-person sentence (Je ...) into a plural 2nd person (Vous ...).
      * The result is not capitalized to allow forming a new sentence.
      *
-     * TODO: does not deal with all 3rd group verbs.
      *
-     * @param text
+     * @param text le message à conjuger
      * @return The 2nd-person sentence.
-     * @throws CsvValidationException
      */
     public String firstToSecondPerson(final String text) throws CsvValidationException {
         String processedText = text;
@@ -112,7 +111,7 @@ public class MessageProcessor {
     /**
      * Generate a response to the input text.
      * 
-     * @param input
+     * @param input le message entré
      * @return The response (String).
      */
     public String generateResponse(final String input) {
@@ -141,7 +140,7 @@ public class MessageProcessor {
     /**
      * Set the name.
      * 
-     * @param name
+     * @param name le nom de l'utilisateur
      */
     public void setName(final String name) {
         this.name = name;
@@ -152,6 +151,14 @@ public class MessageProcessor {
      */
     public Random getRandom() {
         return random;
+    }
+
+    public List<IResponseRule> getResponseRules() {
+        return responseRules;
+    }
+
+    public void setResponseRules(final List<IResponseRule> responseRules) {
+        this.responseRules = responseRules;
     }
 
 }

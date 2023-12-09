@@ -21,15 +21,16 @@ import java.util.Set;
  * Main class of the controller.
  */
 public class MessageController {
-    private MessageProcessor model;
-    private List<JfxView> views;
-    private ObservableList<SearchStrategy> listeObservable = FXCollections.observableArrayList();
+    private final MessageProcessor model;
+    private final List<JfxView> views;
+    private final ObservableList<SearchStrategy> listeObservable
+            = FXCollections.observableArrayList();
     private SearchStrategy currentSearchStrategy;
 
     /**
      * Constructor.
      * 
-     * @param view
+     * @param view la vue
      */
     public MessageController(final List<JfxView> view) {
         this.model = new MessageProcessor();
@@ -62,7 +63,7 @@ public class MessageController {
     /**
      * Change the current search strategy.
      * 
-     * @param newValue
+     * @param newValue la nouvelle méthode de recherche
      */
     public void changeSearchStrategy(final SearchStrategy newValue) {
         this.currentSearchStrategy = newValue;
@@ -76,10 +77,10 @@ public class MessageController {
      * Process the sended message, generate a response and call the view to display
      * it.
      * 
-     * @param input
+     * @param input le message à envoyer
      */
     public void processUserInput(final String input) {
-        if(input == null || input.isEmpty()) {
+        if (input == null || input.isEmpty()) {
             return;
         }
         String response = model.generateResponse(model.normalize(input));
@@ -92,8 +93,12 @@ public class MessageController {
         }
     }
 
-    public void processUserImage(File imageFile) {
-        if(imageFile == null) {
+    /**.
+     * Procédure permettant d'envoyer une image
+     */
+
+    public void processUserImage(final File imageFile) {
+        if (imageFile == null) {
             return;
         }
         String response = model.generateResponse(model.normalize(imageFile.getName()));
@@ -110,7 +115,7 @@ public class MessageController {
     /**
      * Process the receveid message.
      * 
-     * @param messageId
+     * @param messageId the ID's message
      */
     public void deleteMessageViews(final String messageId) {
         for (JfxView v : views) {
@@ -163,7 +168,6 @@ public class MessageController {
                 }
             }
             view.getDialog().getChildren().removeAll(toDelete);
-            // text.setText("");
         }
     }
 

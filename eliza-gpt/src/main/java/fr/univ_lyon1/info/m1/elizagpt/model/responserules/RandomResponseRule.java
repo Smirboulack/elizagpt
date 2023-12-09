@@ -6,13 +6,12 @@ import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
  * A response rule that generates a random response.
  */
 public class RandomResponseRule implements IResponseRule {
-
     /**
      * Check if the rule applies to the input.
-     * 
-     * @param input
-     * @param processor
-     * @return
+     *
+     * @param input le message à envoyer
+     * @param processor le modèle
+     * @return le résultat de la vérification
      */
     @Override
     public boolean appliesTo(final String input, final MessageProcessor processor) {
@@ -21,10 +20,10 @@ public class RandomResponseRule implements IResponseRule {
 
     /**
      * Generate a response.
-     * 
-     * @param input
-     * @param processor
-     * @return
+     *
+     * @param input le message à envoyer
+     * @param processor le modèle
+     * @return le réponse générée
      */
     @Override
     public String generateResponse(final String input, final MessageProcessor processor) {

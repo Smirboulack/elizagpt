@@ -20,7 +20,7 @@ public class VerbList {
     /**
      * Constructor.
      * 
-     * @throws CsvValidationException
+     * @throws CsvValidationException l'exception
      */
     public VerbList() throws CsvValidationException {
         loadVerbsFromCSV("src/main/resources/french-verb-conjugation.csv");
@@ -48,6 +48,12 @@ public class VerbList {
         return verbs;
     }
 
+    /**
+     * Normalize the given text by replacing pronouns.
+     *
+     * @param text The text to normalize.
+     * @return The normalized text.
+     */
     public String replacePronouns(String text) {
         text = text.replaceAll("[Jj]e ", "vous ");
         text = text.replaceAll("([Jj]')", "vous ");
@@ -55,6 +61,12 @@ public class VerbList {
         return text;
     }
 
+    /**.
+     * Normalize the given text by verbs by the right conjugation
+     *
+     * @param text The text to normalize.
+     * @return The normalized text.
+     */
     public String replaceVerbs(String text) {
         for (Verb verb : VerbList.getVerbs()) {
             text = text.replaceAll("\\b" + verb.getFirstSingular() + "\\b", verb.getSecondPlural());
@@ -62,8 +74,15 @@ public class VerbList {
         return text;
     }
 
+    /**.
+     * Replace possessive pronouns in the given text with their corresponding English conjugations.
+     *
+     * @param text The text to process.
+     * @return The text with possessive pronouns replaced.
+     */
     public String replacePossessives(String text) {
-        Pattern pattern = Pattern.compile("\\bme\\b|\\bma\\b|\\bmes\\b|\\bmoi\\b|\\bm'a\\b", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("\\bme\\b|\\bma\\b|\\bmes\\b|\\bmoi\\b|\\bm'a\\b",
+                Pattern.CASE_INSENSITIVE);
         java.util.regex.Matcher matcher = pattern.matcher(text);
 
         StringBuffer sb = new StringBuffer();
@@ -71,20 +90,17 @@ public class VerbList {
             String replacement;
             switch (matcher.group().toLowerCase()) {
                 case "me":
+
                     replacement = (matcher.start() == 0 ? "Vous" : "vous");
                     break;
                 case "ma":
+                case "m'a":
                     replacement = (matcher.start() == 0 ? "Votre" : "votre");
                     break;
                 case "mes":
                     replacement = (matcher.start() == 0 ? "Vos" : "vos");
                     break;
-                case "moi":
-                    replacement = (matcher.start() == 0 ? "Vous" : "vous");
-                    break;
-                case "m'a":
-                    replacement = (matcher.start() == 0 ? "Votre" : "votre");
-                    break;
+
                 default:
                     continue;
             }

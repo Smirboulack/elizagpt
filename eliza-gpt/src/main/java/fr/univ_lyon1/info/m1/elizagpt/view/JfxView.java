@@ -17,8 +17,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -33,14 +31,14 @@ import javafx.util.StringConverter;
  */
 public class JfxView {
     private final VBox dialog;
-    private Map<String, HBox> hBoxMap = new HashMap<>();
+    private final Map<String, HBox> hBoxMap = new HashMap<>();
     private List<HBox> chatHistory;
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
-    private ComboBox<SearchStrategy> comboBox;
+    private final ComboBox<SearchStrategy> comboBox;
     private MessageController controller;
-    private ImageView imagePreview;
+    private final ImageView imagePreview;
     private File selectedImageFile;
 
     /**
@@ -81,7 +79,7 @@ public class JfxView {
     /**
      * Set the controller of the view.
      * 
-     * @param controller
+     * @param controller the cotroller
      */
     public void setController(final MessageController controller) {
         this.controller = controller;
@@ -139,7 +137,7 @@ public class JfxView {
     /**
      * Update the text of the search label.
      * 
-     * @param text
+     * @param text the text to search
      */
     public void updateSearchLabel(final String text) {
         searchTextLabel.setText(text);
@@ -148,7 +146,7 @@ public class JfxView {
     /**
      * Return the search text label.
      * 
-     * @return
+     * @return Label the SearchTextLabel
      */
     public Label getSearchTextLabel() {
         return searchTextLabel;
@@ -178,7 +176,7 @@ public class JfxView {
     /**
      * Return the dialog.
      * 
-     * @return
+     * @return la Vbox dialog
      */
     public VBox getDialog() {
         return dialog;
@@ -194,7 +192,7 @@ public class JfxView {
     /**
      * Set the chatHistory.
      *
-     * @param chatHistory
+     * @param chatHistory l'historique du chat
      */
     public void setChatHistory(final List<HBox> chatHistory) {
         this.chatHistory = new ArrayList<>(chatHistory);

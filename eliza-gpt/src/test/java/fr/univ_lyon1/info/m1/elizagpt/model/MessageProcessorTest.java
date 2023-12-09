@@ -1,6 +1,13 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
 import org.junit.jupiter.api.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+
+import java.util.Arrays;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 /**
@@ -13,6 +20,21 @@ public class MessageProcessorTest {
         MessageProcessor p = new MessageProcessor();
 
         // Then
+        String[] sp = {"J'", "Je ", "M'"};
+        String[] r = {"Pourquoi dites-vous que ", "Pourquoi pensez-vous que ","Êtes-vous sûr que "};
+
+        // When & Then
+        for (String st : sp) {
+            String response = p.generateResponse(st);
+            System.out.println("Input: " + st);
+            System.out.println("Generated Response: " + response);
+
+            boolean containsExpectedSubstring = Arrays.stream(r)
+                    .anyMatch(expectedSubstring -> response != null && response.contains(expectedSubstring));
+
+            assertThat(containsExpectedSubstring, is(true));
+        }
+
         /* assertThat(p.firstToSecondPerson("Je pense à mon chien."),
                 is("vous pensez à votre chien."));
 

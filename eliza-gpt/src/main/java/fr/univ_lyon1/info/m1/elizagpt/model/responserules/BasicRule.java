@@ -1,7 +1,6 @@
 package fr.univ_lyon1.info.m1.elizagpt.model.responserules;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.opencsv.exceptions.CsvValidationException;
@@ -14,17 +13,17 @@ public class BasicRule implements IResponseRule {
     /**
      * Check if the rule applies to the input.
      * 
-     * @param input
-     * @param processor
-     * @return
+     * @param input le message à envoyer
+     * @param processor le modèle
+     * @return le résultat de la vérification
      */
     @Override
     public boolean appliesTo(final String input, final MessageProcessor processor) {
         boolean pattern1 = Pattern.compile("(Je .*)", Pattern.CASE_INSENSITIVE)
                 .matcher(input).matches();
-        boolean pattern2 = Pattern.compile("(J\'.*)", Pattern.CASE_INSENSITIVE)
+        boolean pattern2 = Pattern.compile("(J'.*)", Pattern.CASE_INSENSITIVE)
                 .matcher(input).matches();
-        boolean pattern3 = Pattern.compile("(Mm\'.*)", Pattern.CASE_INSENSITIVE)
+        boolean pattern3 = Pattern.compile("([Mm]'.*)", Pattern.CASE_INSENSITIVE)
                 .matcher(input).matches();
         return pattern1 || pattern2 || pattern3;
     }
@@ -32,9 +31,9 @@ public class BasicRule implements IResponseRule {
     /**
      * Generate a response.
      * 
-     * @param input
-     * @param processor
-     * @return
+     * @param input le message à envoyer
+     * @param processor le modèle
+     * @return la réponse générée
      */
     @Override
     public String generateResponse(final String input, final MessageProcessor processor) {
