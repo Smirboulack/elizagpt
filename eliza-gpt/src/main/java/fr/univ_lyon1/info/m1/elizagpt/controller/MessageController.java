@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 /**
  * Main class of the controller.
@@ -38,6 +39,7 @@ public class MessageController {
         this.chargerStrategies();
         for (JfxView v : views) {
             v.setController(this);
+            initializeComboBox(v);
         }
     }
 
@@ -45,10 +47,8 @@ public class MessageController {
      * Load all the search strategies.
      */
     public void chargerStrategies() {
-        Reflections reflections =
-         new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
-        Set<Class<? extends SearchStrategy>> classes = 
-        reflections.getSubTypesOf(SearchStrategy.class);
+        Reflections reflections = new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
+        Set<Class<? extends SearchStrategy>> classes = reflections.getSubTypesOf(SearchStrategy.class);
 
         for (Class<? extends SearchStrategy> classe : classes) {
             try {
@@ -58,6 +58,23 @@ public class MessageController {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void initializeComboBox(final JfxView view) {
+        view.getComboBox().setItems(listeObservable);
+        view.getComboBox().setConverter(new StringConverter<SearchStrategy>() {
+
+            @Override
+            public String toString(final SearchStrategy object) {
+                return object.getClass().getSimpleName();
+            }
+
+            @Override
+            public SearchStrategy fromString(final String string) {
+                return null;
+            }
+        });
+        view.getComboBox().getSelectionModel().selectFirst();
     }
 
     /**
@@ -88,63 +105,43 @@ public class MessageController {
         ChatMessage message = new ChatMessage(idu, input, "user",
                 DateUtils.addSeconds(new java.util.Date(), 0).toString(),
                 ChatMessage.USER_STYLE);
-        ChatMessage response = 
-        new ChatMessage(ide, model.generateResponse(model.normalize(input)), "eliza",
+        ChatMessage response = new ChatMessage(ide, model.generateResponse(model.normalize(input)), "eliza",
                 DateUtils.addSeconds(new java.util.Date(), 0).toString(), ChatMessage.ELIZA_STYLE);
         for (JfxView v : views) {
             v.getMessages().add(message);
             v.getMessages().add(response);
-            v.displayMessages();
+            v.displayMessage(message);
+            v.displayMessage(response);
         }
     }
-
-    /*
-     * public void processUserImage(final File imageFile) {
-     * if (imageFile == null) {
-     * return;
-     * }
-     * String response =
-     * model.generateResponse(model.normalize(imageFile.getName()));
-     * // create random string id
-     * String messageIdUser = String.valueOf(model.getRandom().nextInt());
-     * String messageIdEliza = String.valueOf(model.getRandom().nextInt());
-     * for (JfxView v : views) {
-     * // v.displayMessages(imageFile, "user", messageIdUser);
-     * // v.displayMessages(response, "eliza", messageIdEliza);
-     * }
-     * }
-     */
 
     /**
      * Process the receveid message.
      * 
      * @param message
      */
-public void deleteMessageViews(final ChatMessage message) {
-    for (JfxView v : views) {
-        // Supprimer le messageContainer de dialog
-        v.getDialog().getChildren().removeIf(node -> {
-            if (node instanceof VBox) {
-                VBox messageContainer = (VBox) node;
-                if (!messageContainer.getChildren().isEmpty() 
-                && messageContainer.getChildren().get(1) instanceof HBox) {
-                    HBox container = (HBox) messageContainer.getChildren().get(1);
-                    return container.getId().equals(Integer.toString(message.getId()));
+    public void deleteMessageViews(final ChatMessage message) {
+        for (JfxView v : views) {
+            // Supprimer le messageContainer de dialog
+            v.getDialog().getChildren().removeIf(node -> {
+                if (node instanceof VBox) {
+                    VBox messageContainer = (VBox) node;
+                    if (!messageContainer.getChildren().isEmpty()
+                            && messageContainer.getChildren().get(1) instanceof HBox) {
+                        HBox container = (HBox) messageContainer.getChildren().get(1);
+                        return container.getId().equals(Integer.toString(message.getId()));
+                    }
                 }
+                return false;
+            });
+            
+            v.getMessages().removeIf(m -> m.getId() == message.getId());
+
+            if (this.isChatStateSaved) {
+                v.getMessagesSaved().removeIf(m -> m.getId() == message.getId());
             }
-            return false;
-        });
-
-        // Supprimer le message de la liste des messages
-        v.removeMessage(message);
-
-        // Si l'état du chat est sauvegardé, supprimer le message de la liste sauvegardée
-        if (this.isChatStateSaved) {
-            v.getMessagesSaved().removeIf(m -> m.getId() == message.getId());
         }
     }
-}
-
 
     /**
      * Save the current chat state.
@@ -174,7 +171,7 @@ public void deleteMessageViews(final ChatMessage message) {
                     .filter(m -> currentSearchStrategy.search(m.getText(), text))
                     .collect(Collectors.toList());
             view.setMessages(filteredMessages);
-            view.displayMessages();
+            view.displayAllMessages();
         }
     }
 
@@ -187,7 +184,7 @@ public void deleteMessageViews(final ChatMessage message) {
         }
         for (JfxView view : views) {
             view.setMessages(new ArrayList<>(view.getMessagesSaved()));
-            view.displayMessages();
+            view.displayAllMessages();
         }
         isChatStateSaved = false;
     }

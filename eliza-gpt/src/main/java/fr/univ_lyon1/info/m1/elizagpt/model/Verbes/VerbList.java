@@ -54,28 +54,57 @@ public class VerbList {
      * @param text The text to normalize.
      * @return The normalized text.
      */
-    public String replacePronouns(String text) {
-        text = text.replaceAll("[Jj]e ", "vous ");
-        text = text.replaceAll("([Jj]')", "vous ");
-        text = text.replaceAll("([Mm]')", "vous ");
-        return text;
+    public String replacePronounsFirstToSecond(final String text) {
+        String procesString = text;
+        procesString = procesString.replaceAll("[Jj]e ", "vous ");
+        procesString = procesString.replaceAll("([Jj]')", "vous ");
+        procesString = procesString.replaceAll("([Mm]')", "vous ");
+        return procesString;
     }
 
-    /**.
+    public String replacePronounsSecondToFirst(final String text) {
+        String procesString = text;
+        procesString = procesString.replaceAll("[Vv]ous ", "je ");
+        return procesString;
+    }
+
+    /**
+     * .
      * Normalize the given text by verbs by the right conjugation
      *
      * @param text The text to normalize.
      * @return The normalized text.
      */
-    public String replaceVerbs(String text) {
+    public String verbsFirstToSecond(final String text) {
+        String procesString = text;
         for (Verb verb : VerbList.getVerbs()) {
-            text = text.replaceAll("\\b" + verb.getFirstSingular() + "\\b", verb.getSecondPlural());
+            procesString = procesString.replaceAll("\\b" + verb.getFirstSingular() + "\\b", verb.getSecondPlural());
         }
-        return text;
+        return procesString;
     }
 
-    /**.
-     * Replace possessive pronouns in the given text with their corresponding English conjugations.
+    public String verbsSecondToFirst(final String text) {
+        String procesString = text;
+        String verbFirst = "";
+        for (Verb verb : VerbList.getVerbs()) {
+            verbFirst = convertVerb(verb.getSecondPlural());
+            procesString = procesString.replaceAll("\\b" + verb.getSecondPlural() + "\\b", verbFirst);
+        }
+        return procesString;
+    }
+
+    public String convertVerb(final String verb) {
+        return VerbList.getVerbs().stream()
+                .filter(v -> v.getSecondPlural().equals(verb))
+                .findFirst()
+                .get()
+                .getFirstSingular();
+    }
+
+    /**
+     * .
+     * Replace possessive pronouns in the given text with their corresponding
+     * English conjugations.
      *
      * @param text The text to process.
      * @return The text with possessive pronouns replaced.

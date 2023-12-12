@@ -101,8 +101,18 @@ public class MessageProcessor {
     public String firstToSecondPerson(final String text) throws CsvValidationException {
         String processedText = text;
 
-        processedText = verbList.replacePronouns(processedText);
-        processedText = verbList.replaceVerbs(processedText);
+        processedText = verbList.replacePronounsFirstToSecond(processedText);
+        processedText = verbList.verbsFirstToSecond(processedText);
+        processedText = verbList.replacePossessives(processedText);
+
+        return processedText;
+    }
+
+    public String secondToFirstPerson(final String text) throws CsvValidationException {
+        String processedText = text;
+
+        processedText = verbList.replacePronounsSecondToFirst(processedText);
+        processedText = verbList.verbsSecondToFirst(processedText);
         processedText = verbList.replacePossessives(processedText);
 
         return processedText;

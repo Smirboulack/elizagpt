@@ -1,5 +1,7 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
+import javafx.scene.control.Button;
+
 /**
  * Class representing a chat message.
  */
@@ -9,6 +11,7 @@ public class ChatMessage {
     private String author;
     private String date;
     private String style;
+    public Button deleteButton = new Button();
 
     public static final String BASE_STYLE = "-fx-padding: 8px; "
             + "-fx-margin: 5px; "
@@ -25,8 +28,8 @@ public class ChatMessage {
      * @param date
      * @param style
      */
-    public ChatMessage(final int idm, final String text, final String author, final String date, 
-    final String style) {
+    public ChatMessage(final int idm, final String text, final String author, final String date,
+            final String style) {
         this.id = idm;
         this.text = text;
         this.author = author;

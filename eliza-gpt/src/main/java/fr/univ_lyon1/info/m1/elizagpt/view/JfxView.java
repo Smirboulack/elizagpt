@@ -20,7 +20,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
 /**
  * Main class of the View (GUI) of the application.
@@ -60,8 +59,7 @@ public class JfxView {
         final Pane input = createInputWidget();
         root.getChildren().add(input);
         this.trashImage = new Image("file:src/main/resources/trash.png");
-        this.messages.add(new ChatMessage(1, "Bonjour.", "eliza", "Now", ChatMessage.ELIZA_STYLE));
-        this.displayMessages();
+        this.displayMessage(new ChatMessage(1, "Bonjour.", "eliza", "Now", ChatMessage.ELIZA_STYLE));
 
         this.imagePreview = new ImageView();
         imagePreview.setFitHeight(100);
@@ -83,76 +81,64 @@ public class JfxView {
      */
     public void setController(final MessageController controller) {
         this.controller = controller;
-        initializeComboBox();
-    }
-
-    private void initializeComboBox() {
-        comboBox.setItems(controller.getListeObservable());
-        comboBox.setConverter(new StringConverter<SearchStrategy>() {
-            @Override
-            public String toString(final SearchStrategy object) {
-                return object.getClass().getSimpleName();
-            }
-
-            @Override
-            public SearchStrategy fromString(final String string) {
-                return null;
-            }
-        });
-        comboBox.getSelectionModel().selectFirst();
     }
 
     /**
      * Display the messages in the dialog.
      */
-    public void displayMessages() {
+
+    public void displayAllMessages() {
         dialog.getChildren().clear();
         for (ChatMessage message : messages) {
-            Label timeLabel = new Label(message.getDate());
-            timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
-
-            // HBox pour le message
-            HBox outerHBox = new HBox();
-
-            // Style et contenu du message
-            HBox innerHBox = new HBox(5.0);
-            innerHBox.setStyle(message.getStyle());
-            Label messageLabel = new Label(message.getText());
-            messageLabel.setWrapText(true);
-            innerHBox.getChildren().add(messageLabel);
-
-            // Ajouter le message à la outerHBox
-            outerHBox.getChildren().add(innerHBox);
-
-            // Bouton de suppression avec icône de poubelle
-            ImageView trashView = new ImageView(trashImage);
-            trashView.setFitHeight(25);
-            trashView.setFitWidth(25);
-            Button deleteButton = new Button();
-            deleteButton.setGraphic(trashView);
-            deleteButton.setOnAction(event -> {
-                controller.deleteMessageViews(message);
-            });
-
-            VBox messageContainer = new VBox(2);
-            messageContainer.getChildren().add(timeLabel);
-            messageContainer.setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT
-                    : Pos.CENTER_LEFT);
-
-            HBox container = new HBox(5); // Contient le message et le bouton de suppression
-            container.setId(Integer.toString(message.getId()));
-            container.getChildren().addAll(outerHBox, deleteButton);
-            container.setAlignment(message.getAuthor()
-                    .equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-
-            messageContainer.getChildren().add(container);
-
-            // Ajouter le messageContainer à dialog
-            dialog.getChildren().add(messageContainer); // Ajouter messageContainer ici
+            dialog.getChildren().add(createMessageVisual(message));
         }
     }
 
-    
+    public void displayMessage(ChatMessage message) {
+        dialog.getChildren().add(createMessageVisual(message));
+    }
+
+    private VBox createMessageVisual(ChatMessage message) {
+        Label timeLabel = new Label(message.getDate());
+        timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
+
+        // HBox pour le message
+        HBox outerHBox = new HBox();
+
+        // Style et contenu du message
+        HBox innerHBox = new HBox(5.0);
+        innerHBox.setStyle(message.getStyle());
+        Label messageLabel = new Label(message.getText());
+        messageLabel.setWrapText(true);
+        innerHBox.getChildren().add(messageLabel);
+
+        outerHBox.getChildren().add(innerHBox);
+
+        ImageView trashView = new ImageView(trashImage);
+        trashView.setFitHeight(25);
+        trashView.setFitWidth(25);
+        Button deleteButton = new Button();
+        deleteButton.setGraphic(trashView);
+        deleteButton.setOnAction(event -> {
+            controller.deleteMessageViews(message);
+        });
+
+        VBox messageContainer = new VBox(2);
+        messageContainer.getChildren().add(timeLabel);
+        messageContainer.setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT
+                : Pos.CENTER_LEFT);
+
+        HBox container = new HBox(5);
+        container.setId(Integer.toString(message.getId()));
+        container.getChildren().addAll(outerHBox, deleteButton);
+        container.setAlignment(message.getAuthor()
+                .equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+        messageContainer.getChildren().add(container);
+
+        return messageContainer;
+
+    }
 
     /*
      * public void displayMessages() {
@@ -173,7 +159,6 @@ public class JfxView {
      * ImageView trashView = new ImageView(trashImage);
      * trashView.setFitHeight(20);
      * trashView.setFitWidth(20);
-     * 
      * 
      * Button deleteButton = new Button();
      * deleteButton.setGraphic(trashView);
@@ -196,14 +181,6 @@ public class JfxView {
      */
     public TextField getSearchText() {
         return searchText;
-    }
-
-    /**
-     * Remove a message from the list of messages.
-     * 
-     */
-    public void removeMessage(final ChatMessage message) {
-        messages.removeIf(m -> m.getId() == message.getId());
     }
 
     /**
@@ -274,6 +251,14 @@ public class JfxView {
         this.messagesSaved = messagesSaved;
     }
 
+    public ComboBox<SearchStrategy> getComboBox() {
+        return comboBox;
+    }
+
+    public void setComboBox(final ComboBox<SearchStrategy> comboBox) {
+        this.comboBox = comboBox;
+    }
+
     /**
      * Create the search widget.
      */
@@ -338,7 +323,7 @@ public class JfxView {
         });
 
         // Création du bouton de sélection de fichier avec une icône
-        Image fileIcon = new Image("file:src/main/resources/AML_pur.png");
+        Image fileIcon = new Image("file:src/main/resources/image_logo.png");
         ImageView iconView = new ImageView(fileIcon);
         iconView.setFitHeight(20);
         iconView.setFitWidth(20);
