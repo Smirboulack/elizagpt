@@ -2,7 +2,7 @@ package fr.univ_lyon1.info.m1.elizagpt.model.responserules;
 
 import java.util.regex.Pattern;
 
-import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 
 /**
  * Interface for a rule that generates a response.
@@ -16,7 +16,7 @@ public class QuestionRandomRule implements IResponseRule {
      * @return le résultat de la vérification
      */
     @Override
-    public boolean appliesTo(final String input, final MessageProcessor processor) {
+    public boolean appliesTo(final String input, final Processor processor) {
         return Pattern.compile(".*\\?\\s*.*$", Pattern.CASE_INSENSITIVE)
                 .matcher(input)
                 .matches();
@@ -30,7 +30,7 @@ public class QuestionRandomRule implements IResponseRule {
      * @return le réponse générée
      */
     @Override
-    public String generateResponse(final String input, final MessageProcessor processor) {
+    public String generateResponse(final String input, final Processor processor) {
         String response = processor.pickRandom(new String[] {
                 "Je vous renvoie la question.",
                 "Ici, c'est moi qui pose les questions."

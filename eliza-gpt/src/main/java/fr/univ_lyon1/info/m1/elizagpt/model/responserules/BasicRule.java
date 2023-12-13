@@ -1,6 +1,6 @@
 package fr.univ_lyon1.info.m1.elizagpt.model.responserules;
 
-import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 import java.util.regex.Pattern;
 
 import com.opencsv.exceptions.CsvValidationException;
@@ -18,7 +18,7 @@ public class BasicRule implements IResponseRule {
      * @return le résultat de la vérification
      */
     @Override
-    public boolean appliesTo(final String input, final MessageProcessor processor) {
+    public boolean appliesTo(final String input, final Processor processor) {
         boolean pattern1 = Pattern.compile("(Je .*)", Pattern.CASE_INSENSITIVE)
                 .matcher(input).matches();
         boolean pattern2 = Pattern.compile("(J'.*)", Pattern.CASE_INSENSITIVE)
@@ -36,7 +36,7 @@ public class BasicRule implements IResponseRule {
      * @return la réponse générée
      */
     @Override
-    public String generateResponse(final String input, final MessageProcessor processor) {
+    public String generateResponse(final String input, final Processor processor) {
         String startQuestion = processor.pickRandom(new String[] {
                 "Pourquoi dites-vous que ",
                 "Pourquoi pensez-vous que ",

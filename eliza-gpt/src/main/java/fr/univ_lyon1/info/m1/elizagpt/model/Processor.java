@@ -17,7 +17,7 @@ import fr.univ_lyon1.info.m1.elizagpt.model.responserules.IResponseRule;
 /**
  * Logic to process a message (and probably reply to it).
  */
-public class MessageProcessor {
+public class Processor {
     // private List<HBox> messages;
     private String name;
     private final Random random = new Random();
@@ -27,7 +27,7 @@ public class MessageProcessor {
     /**
      * Constructor.
      */
-    public MessageProcessor() {
+    public Processor() {
         try {
             verbList = new VerbList();
             responseRules = loadRulesFromConfig(

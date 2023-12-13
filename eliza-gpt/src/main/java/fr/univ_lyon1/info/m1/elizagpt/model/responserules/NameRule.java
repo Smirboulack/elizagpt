@@ -3,7 +3,7 @@ package fr.univ_lyon1.info.m1.elizagpt.model.responserules;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 
 /**
  * Interface for a rule that generates a response.
@@ -18,7 +18,7 @@ public class NameRule implements IResponseRule {
      * @return le résultat de la vérification
      */
     @Override
-    public boolean appliesTo(final String input, final MessageProcessor processor) {
+    public boolean appliesTo(final String input, final Processor processor) {
         return Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
                 .matcher(input)
                 .matches();
@@ -32,7 +32,7 @@ public class NameRule implements IResponseRule {
      * @return le réponse générée
      */
     @Override
-    public String generateResponse(final String input, final MessageProcessor processor) {
+    public String generateResponse(final String input, final Processor processor) {
         Matcher matcher = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
                 .matcher(input);
         if (matcher.matches()) {

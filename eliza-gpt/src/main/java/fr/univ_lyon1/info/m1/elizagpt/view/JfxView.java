@@ -26,29 +26,34 @@ import javafx.stage.Stage;
  */
 public class JfxView {
     private VBox dialog;
-    private List<ChatMessage> messages = new ArrayList<>();
-    private List<ChatMessage> messagesSaved = new ArrayList<>();
+    final VBox root;
+    private List<Message> messages = new ArrayList<>();
+    private List<Message> messagesSaved = new ArrayList<>();
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
-    private ComboBox<SearchStrategy> comboBox;
+    private ComboBox<SearchStrategy> strategySelect;
     private MessageController controller;
     private ImageView imagePreview;
     private File selectedImageFile;
     private final Image trashImage;
+    Button themeToggleButton;
+    ImageView toggleImageView;
 
     /**
      * Main class of the View (GUI) of the application.
      */
     public JfxView(final Stage stage, final double width, final double height) {
         stage.setTitle("Eliza GPT");
-        final VBox root = new VBox(10);
-        this.comboBox = new ComboBox<>();
+        root = new VBox(10);
+        root.setStyle("-fx-background-color: #FFFFFF;");
+        this.strategySelect = new ComboBox<>();
         final Pane search = createSearchWidget();
-        root.getChildren().add(search);
+        root.getChildren().addAll(search);
 
         ScrollPane dialogScroll = new ScrollPane();
         dialog = new VBox(10);
+        dialog.setStyle("-fx-background-color: #FFFFFF;");
         dialogScroll.setContent(dialog);
 
         // scroll to bottom by default:
@@ -59,7 +64,7 @@ public class JfxView {
         final Pane input = createInputWidget();
         root.getChildren().add(input);
         this.trashImage = new Image("file:src/main/resources/trash.png");
-        this.displayMessage(new ChatMessage(1, "Bonjour.", "eliza", "Now", ChatMessage.ELIZA_STYLE));
+        this.displayMessage(new Message(1, "Bonjour.", "eliza", "Now", Message.ELIZA_STYLE));
 
         this.imagePreview = new ImageView();
         imagePreview.setFitHeight(100);
@@ -89,16 +94,16 @@ public class JfxView {
 
     public void displayAllMessages() {
         dialog.getChildren().clear();
-        for (ChatMessage message : messages) {
+        for (Message message : messages) {
             dialog.getChildren().add(createMessageVisual(message));
         }
     }
 
-    public void displayMessage(ChatMessage message) {
+    public void displayMessage(Message message) {
         dialog.getChildren().add(createMessageVisual(message));
     }
 
-    private VBox createMessageVisual(ChatMessage message) {
+    private VBox createMessageVisual(Message message) {
         Label timeLabel = new Label(message.getDate());
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
 
@@ -139,40 +144,6 @@ public class JfxView {
         return messageContainer;
 
     }
-
-    /*
-     * public void displayMessages() {
-     * dialog.getChildren().clear();
-     * for (ChatMessage message : messages) {
-     * HBox outerHBox = new HBox();
-     * String idMessage = Integer.toString(message.getId());
-     * outerHBox.setId(idMessage);
-     * outerHBox
-     * .setAlignment(message.getAuthor().equals("user") ? Pos.CENTER_RIGHT :
-     * Pos.CENTER_LEFT);
-     * 
-     * HBox innerHBox = new HBox(5.0);
-     * innerHBox.setStyle(message.getStyle());
-     * 
-     * Label messageLabel = new Label(message.getText());
-     * messageLabel.setWrapText(true);
-     * ImageView trashView = new ImageView(trashImage);
-     * trashView.setFitHeight(20);
-     * trashView.setFitWidth(20);
-     * 
-     * Button deleteButton = new Button();
-     * deleteButton.setGraphic(trashView);
-     * 
-     * deleteButton.setOnAction(event -> {
-     * controller.deleteMessageViews(message);
-     * });
-     * 
-     * innerHBox.getChildren().addAll(messageLabel, deleteButton);
-     * outerHBox.getChildren().add(innerHBox);
-     * dialog.getChildren().add(outerHBox);
-     * }
-     * }
-     */
 
     /**
      * Return the search text field.
@@ -235,28 +206,28 @@ public class JfxView {
         this.dialog = dialog;
     }
 
-    public List<ChatMessage> getMessages() {
+    public List<Message> getMessages() {
         return messages;
     }
 
-    public void setMessages(final List<ChatMessage> messages) {
+    public void setMessages(final List<Message> messages) {
         this.messages = messages;
     }
 
-    public List<ChatMessage> getMessagesSaved() {
+    public List<Message> getMessagesSaved() {
         return messagesSaved;
     }
 
-    public void setMessagesSaved(final List<ChatMessage> messagesSaved) {
+    public void setMessagesSaved(final List<Message> messagesSaved) {
         this.messagesSaved = messagesSaved;
     }
 
     public ComboBox<SearchStrategy> getComboBox() {
-        return comboBox;
+        return strategySelect;
     }
 
     public void setComboBox(final ComboBox<SearchStrategy> comboBox) {
-        this.comboBox = comboBox;
+        this.strategySelect = comboBox;
     }
 
     /**
@@ -271,7 +242,7 @@ public class JfxView {
         });
 
         // Configuration du ComboBox
-        comboBox.getSelectionModel()
+        strategySelect.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
                     if (newValue != null) {
@@ -279,7 +250,7 @@ public class JfxView {
                     }
                 });
 
-        firstLine.getChildren().addAll(searchText, comboBox);
+        firstLine.getChildren().addAll(searchText, strategySelect);
 
         final Button send = new Button("Search");
         send.setOnAction(e -> {
@@ -351,6 +322,51 @@ public class JfxView {
         });
 
         input.getChildren().addAll(text, send, fileButton);
+        input.getChildren().add(darkModBox());
         return input;
+    }
+
+    private HBox darkModBox() {
+        // Chargement des images
+        Image moonImage = new Image("file:src/main/resources/moon.png");
+        Image sunImage = new Image("file:src/main/resources/sun.png");
+
+        // Créer le bouton avec l'image de la lune
+        toggleImageView = new ImageView(moonImage);
+        toggleImageView.setFitHeight(20);
+        toggleImageView.setFitWidth(20);
+        
+        this.themeToggleButton = new Button("", toggleImageView);
+        themeToggleButton.setText("Dark");
+
+        themeToggleButton.setOnAction(event -> {
+            // Changer le thème et l'image
+            if (themeToggleButton.getText().equals("Dark")) {
+                toggleImageView.setImage(sunImage);
+                controller.changeViewsTheme("Dark");
+            } else {
+                toggleImageView.setImage(moonImage);
+                controller.changeViewsTheme("Light");
+            }
+        });
+
+        // Ajouter le bouton en haut à droite
+        HBox topRightBox = new HBox(themeToggleButton);
+
+        return topRightBox;
+    }
+
+    public void whiteTheme() {
+        this.themeToggleButton.setText("Dark");
+        this.toggleImageView.setImage(new Image("file:src/main/resources/moon.png"));
+        this.root.setStyle(null);
+        this.dialog.setStyle(null);
+    }
+
+    public void darkTheme() {
+        this.themeToggleButton.setText("Light");
+        this.toggleImageView.setImage(new Image("file:src/main/resources/sun.png"));
+        this.root.setStyle("-fx-background-color: #000000;");
+        this.dialog.setStyle("-fx-background-color: #323232;");
     }
 }

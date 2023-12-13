@@ -12,7 +12,7 @@ public class MessageProcessorTest {
     @Test
     void testFirstToSecondPerson() {
         // Given
-        MessageProcessor p = new MessageProcessor();
+        Processor p = new Processor();
 
         // Then
         String[] sp = {"J'", "Je ", "M'"};

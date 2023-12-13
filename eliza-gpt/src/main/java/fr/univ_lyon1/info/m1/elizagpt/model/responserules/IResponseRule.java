@@ -1,6 +1,6 @@
 package fr.univ_lyon1.info.m1.elizagpt.model.responserules;
 
-import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 
 /**
  * Interface for a rule that generates a response.
@@ -13,7 +13,7 @@ public interface IResponseRule {
      * @param processor le modèle
      * @return le résultat de la vérification
      */
-    boolean appliesTo(String input, MessageProcessor processor);
+    boolean appliesTo(String input, Processor processor);
 
     /**
      * Generate a response.
@@ -22,5 +22,5 @@ public interface IResponseRule {
      * @param processor le modèle
      * @return le réponse générée
      */
-    String generateResponse(String input, MessageProcessor processor);
+    String generateResponse(String input, Processor processor);
 }

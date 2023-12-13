@@ -9,8 +9,8 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.reflections.Reflections;
 
 import fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy.SearchStrategy;
-import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
-import fr.univ_lyon1.info.m1.elizagpt.view.ChatMessage;
+import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
+import fr.univ_lyon1.info.m1.elizagpt.view.Message;
 import fr.univ_lyon1.info.m1.elizagpt.view.JfxView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +22,7 @@ import javafx.util.StringConverter;
  * Main class of the controller.
  */
 public class MessageController {
-    private MessageProcessor model;
+    private Processor model;
     private List<JfxView> views;
     private ObservableList<SearchStrategy> listeObservable = FXCollections.observableArrayList();
     private SearchStrategy currentSearchStrategy;
@@ -34,7 +34,7 @@ public class MessageController {
      * @param view
      */
     public MessageController(final List<JfxView> view) {
-        this.model = new MessageProcessor();
+        this.model = new Processor();
         this.views = view;
         this.chargerStrategies();
         for (JfxView v : views) {
@@ -102,11 +102,11 @@ public class MessageController {
         }
         int idu = model.getRandom().nextInt();
         int ide = model.getRandom().nextInt();
-        ChatMessage message = new ChatMessage(idu, input, "user",
+        Message message = new Message(idu, input, "user",
                 DateUtils.addSeconds(new java.util.Date(), 0).toString(),
-                ChatMessage.USER_STYLE);
-        ChatMessage response = new ChatMessage(ide, model.generateResponse(model.normalize(input)), "eliza",
-                DateUtils.addSeconds(new java.util.Date(), 0).toString(), ChatMessage.ELIZA_STYLE);
+                Message.USER_STYLE);
+        Message response = new Message(ide, model.generateResponse(model.normalize(input)), "eliza",
+                DateUtils.addSeconds(new java.util.Date(), 0).toString(), Message.ELIZA_STYLE);
         for (JfxView v : views) {
             v.getMessages().add(message);
             v.getMessages().add(response);
@@ -120,7 +120,7 @@ public class MessageController {
      * 
      * @param message
      */
-    public void deleteMessageViews(final ChatMessage message) {
+    public void deleteMessageViews(final Message message) {
         for (JfxView v : views) {
             // Supprimer le messageContainer de dialog
             v.getDialog().getChildren().removeIf(node -> {
@@ -134,7 +134,7 @@ public class MessageController {
                 }
                 return false;
             });
-            
+
             v.getMessages().removeIf(m -> m.getId() == message.getId());
 
             if (this.isChatStateSaved) {
@@ -167,7 +167,7 @@ public class MessageController {
         }
         saveChatState();
         for (JfxView view : views) {
-            List<ChatMessage> filteredMessages = view.getMessages().stream()
+            List<Message> filteredMessages = view.getMessages().stream()
                     .filter(m -> currentSearchStrategy.search(m.getText(), text))
                     .collect(Collectors.toList());
             view.setMessages(filteredMessages);
@@ -187,5 +187,15 @@ public class MessageController {
             view.displayAllMessages();
         }
         isChatStateSaved = false;
+    }
+
+    public void changeViewsTheme(final String theme) {
+        for (JfxView view : views) {
+            if (theme.equals("Light")) {
+                view.whiteTheme();
+            } else {
+                view.darkTheme();
+            }
+        }
     }
 }

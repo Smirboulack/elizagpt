@@ -1,6 +1,6 @@
 package fr.univ_lyon1.info.m1.elizagpt.model.responserules;
 
-import fr.univ_lyon1.info.m1.elizagpt.model.MessageProcessor;
+import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 
 /**
  * A response rule that generates a random response.
@@ -14,7 +14,7 @@ public class RandomResponseRule implements IResponseRule {
      * @return le résultat de la vérification
      */
     @Override
-    public boolean appliesTo(final String input, final MessageProcessor processor) {
+    public boolean appliesTo(final String input, final Processor processor) {
         return true;
     }
 
@@ -26,7 +26,7 @@ public class RandomResponseRule implements IResponseRule {
      * @return le réponse générée
      */
     @Override
-    public String generateResponse(final String input, final MessageProcessor processor) {
+    public String generateResponse(final String input, final Processor processor) {
         String[] randomResponses = {
                 "Il fait beau aujourd'hui, vous ne trouvez pas ?",
                 "Je ne comprends pas.",
