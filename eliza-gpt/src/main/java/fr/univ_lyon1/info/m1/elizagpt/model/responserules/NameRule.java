@@ -19,7 +19,7 @@ public class NameRule implements IResponseRule {
      */
     @Override
     public boolean appliesTo(final String input, final MessageProcessor processor) {
-        return Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
+        return Pattern.compile(".*Je m'appelle (.*)", Pattern.CASE_INSENSITIVE)
                 .matcher(input)
                 .matches();
     }
@@ -33,7 +33,7 @@ public class NameRule implements IResponseRule {
      */
     @Override
     public String generateResponse(final String input, final MessageProcessor processor) {
-        Matcher matcher = Pattern.compile(".*Je m'appelle (.*)\\.", Pattern.CASE_INSENSITIVE)
+        Matcher matcher = Pattern.compile(".*[Jj]e m'appelle (.*)", Pattern.CASE_INSENSITIVE)
                 .matcher(input);
         if (matcher.matches()) {
             String name = matcher.group(1);

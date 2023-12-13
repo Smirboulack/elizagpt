@@ -1,14 +1,19 @@
 package fr.univ_lyon1.info.m1.elizagpt.view;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+
 /**
  * Class representing a chat message.
  */
 public class ChatMessage {
-    private int id;
+    private final int id;
     private String text;
     private String author;
     private String date;
     private String style;
+    private ImageView image = null;
 
     public static final String BASE_STYLE = "-fx-padding: 8px; "
             + "-fx-margin: 5px; "
@@ -25,14 +30,20 @@ public class ChatMessage {
      * @param date
      * @param style
      */
-    public ChatMessage(final int idm, final String text, final String author, final String date, 
+    public ChatMessage(final int idm, final String text, final ImageView i, final String author, final String date,
     final String style) {
         this.id = idm;
         this.text = text;
         this.author = author;
+        this.image = i;
+        if (i != null) {
+            i.setFitWidth(80);
+            i.setFitHeight(80);
+        }
         this.date = date;
         this.style = style;
     }
+
 
     public int getId() {
         return id;
@@ -73,6 +84,14 @@ public class ChatMessage {
     @Override
     public String toString() {
         return author + " : " + text + " (" + date + ")";
+    }
+
+    public ImageView getImage() {
+        return image;
+    }
+
+    public void setImage(ImageView image) {
+        this.image = image;
     }
 
 }

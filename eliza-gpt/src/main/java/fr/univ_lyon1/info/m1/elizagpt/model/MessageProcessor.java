@@ -1,5 +1,6 @@
 package fr.univ_lyon1.info.m1.elizagpt.model;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -13,6 +14,8 @@ import java.util.Properties;
 
 import fr.univ_lyon1.info.m1.elizagpt.model.Verbes.VerbList;
 import fr.univ_lyon1.info.m1.elizagpt.model.responserules.IResponseRule;
+import fr.univ_lyon1.info.m1.elizagpt.model.responserules.ImageRule;
+import javafx.scene.image.Image;
 
 /**
  * Logic to process a message (and probably reply to it).
@@ -87,7 +90,7 @@ public class MessageProcessor {
         return text.replaceAll("\\s+", " ")
                 .replaceAll("^\\s+", "")
                 .replaceAll("\\s+$", "")
-                .replaceAll("[^\\.!?:]$", "$0.");
+                .replaceAll("[^\\.!?:]$", "$0");
     }
 
     /**
@@ -115,12 +118,21 @@ public class MessageProcessor {
      * @return The response (String).
      */
     public String generateResponse(final String input) {
+        System.out.println("MessageProcesseur: simple");
         for (IResponseRule rule : responseRules) {
             if (rule.appliesTo(input, this)) {
+                System.out.println(rule);
                 return rule.generateResponse(input, this);
             }
         }
         return null;
+    }
+
+
+    public String generateResponseForImage(final String input, final Image imageFile) {
+        System.out.println("MessageProcesseur: ForImage");
+        ImageRule i = new ImageRule();
+        return i.generateResponse(input, imageFile, this);
     }
 
     /** Pick an element randomly in the array. */

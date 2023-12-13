@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.apache.commons.lang3.time.DateUtils;
 import org.reflections.Reflections;
 
@@ -16,6 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
 
 /**
  * Main class of the controller.
@@ -79,41 +82,64 @@ public class MessageController {
      * 
      * @param input
      */
-    public void processUserInput(final String input) {
-        if (input == null || input.isEmpty()) {
-            return;
-        }
-        int idu = model.getRandom().nextInt();
-        int ide = model.getRandom().nextInt();
-        ChatMessage message = new ChatMessage(idu, input, "user",
-                DateUtils.addSeconds(new java.util.Date(), 0).toString(),
-                ChatMessage.USER_STYLE);
-        ChatMessage response = 
-        new ChatMessage(ide, model.generateResponse(model.normalize(input)), "eliza",
-                DateUtils.addSeconds(new java.util.Date(), 0).toString(), ChatMessage.ELIZA_STYLE);
-        for (JfxView v : views) {
-            v.getMessages().add(message);
-            v.getMessages().add(response);
-            v.displayMessages();
-        }
+    public void processUserInput(final String input, final Image imageFile) {
+            ImageView i = null;
+            int idu = model.getRandom().nextInt();
+            int ide = model.getRandom().nextInt();
+
+            System.out.println("input: "+input+" image: "+imageFile);
+
+            if (imageFile != null) { // S'il y a une image
+                System.out.println("ProcessUserInput: avec Image");
+                i = new ImageView(imageFile);
+                ChatMessage message = new ChatMessage(idu, input, i, "user",
+                        DateUtils.addSeconds(new java.util.Date(), 0).toString(),
+                        ChatMessage.USER_STYLE);
+                ChatMessage response =
+                        new ChatMessage(ide, model.generateResponseForImage(model.normalize(input), imageFile), null, "eliza",
+                                DateUtils.addSeconds(new java.util.Date(), 0).toString(), ChatMessage.ELIZA_STYLE);
+                for (JfxView v : views) {
+                    v.getMessages().add(message);
+                    v.getMessages().add(response);
+                    v.displayMessages();
+                }
+            } else if (imageFile == null) { // S'il n'y a pas d'image
+                System.out.println("ProcessUserInput: sans Image");
+                ChatMessage message = new ChatMessage(idu, input, null, "user",
+                        DateUtils.addSeconds(new java.util.Date(), 0).toString(),
+                        ChatMessage.USER_STYLE);
+                ChatMessage response =
+                        new ChatMessage(ide, model.generateResponse(model.normalize(input)), null, "eliza",
+                                DateUtils.addSeconds(new java.util.Date(), 0).toString(), ChatMessage.ELIZA_STYLE);
+                for (JfxView v : views) {
+                    v.getMessages().add(message);
+                    v.getMessages().add(response);
+                    v.displayMessages();
+                }
+            }
     }
 
-    /*
-     * public void processUserImage(final File imageFile) {
-     * if (imageFile == null) {
-     * return;
-     * }
-     * String response =
-     * model.generateResponse(model.normalize(imageFile.getName()));
-     * // create random string id
-     * String messageIdUser = String.valueOf(model.getRandom().nextInt());
-     * String messageIdEliza = String.valueOf(model.getRandom().nextInt());
-     * for (JfxView v : views) {
-     * // v.displayMessages(imageFile, "user", messageIdUser);
-     * // v.displayMessages(response, "eliza", messageIdEliza);
-     * }
-     * }
-     */
+
+      /*public void processUserImage(final Image imageFile) {
+      if (imageFile == null) {
+      return;
+      }
+          int idu = model.getRandom().nextInt();
+          int ide = model.getRandom().nextInt();
+          ImageView i = new ImageView(imageFile);
+          ChatMessage message = new ChatMessage(idu, "", i, "user",
+                  DateUtils.addSeconds(new java.util.Date(), 0).toString(),
+                  ChatMessage.USER_STYLE);
+          ChatMessage response =
+                  new ChatMessage(ide, model.generateResponse(mode ), null, "eliza",
+                          DateUtils.addSeconds(new java.util.Date(), 0).toString(), ChatMessage.ELIZA_STYLE);
+          for (JfxView v : views) {
+              v.getMessages().add(message);
+              v.getMessages().add(response);
+              v.displayMessages();
+          }
+      }*/
+
 
     /**
      * Process the receveid message.

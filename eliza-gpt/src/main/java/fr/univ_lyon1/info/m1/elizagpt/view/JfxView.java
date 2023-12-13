@@ -35,8 +35,10 @@ public class JfxView {
     private ComboBox<SearchStrategy> comboBox;
     private MessageController controller;
     private ImageView imagePreview;
-    private File selectedImageFile;
+    private File selectedImageFile = null;
     private final Image trashImage;
+
+    private Image im = null;
 
     /**
      * Main class of the View (GUI) of the application.
@@ -60,7 +62,7 @@ public class JfxView {
         final Pane input = createInputWidget();
         root.getChildren().add(input);
         this.trashImage = new Image("file:src/main/resources/trash.png");
-        this.messages.add(new ChatMessage(1, "Bonjour.", "eliza", "Now", ChatMessage.ELIZA_STYLE));
+        this.messages.add(new ChatMessage(1, "Bonjour.", null,"eliza", "Now", ChatMessage.ELIZA_STYLE));
         this.displayMessages();
 
         this.imagePreview = new ImageView();
@@ -117,7 +119,12 @@ public class JfxView {
             // Style et contenu du message
             HBox innerHBox = new HBox(5.0);
             innerHBox.setStyle(message.getStyle());
-            Label messageLabel = new Label(message.getText());
+            Label messageLabel = new Label();
+            if (message.getImage() != null) {
+                messageLabel.setGraphic(message.getImage());
+            } else {
+                messageLabel = new Label(message.getText());
+            }
             messageLabel.setWrapText(true);
             innerHBox.getChildren().add(messageLabel);
 
@@ -322,18 +329,21 @@ public class JfxView {
 
         text = new TextField();
         text.setOnAction(e -> {
-            controller.processUserInput(text.getText());
+            controller.processUserInput(text.getText(), null);
             this.text.setText("");
         });
 
         final Button send = new Button("Send");
         send.setOnAction(e -> {
             if (selectedImageFile != null) {
-                // controller.processUserImage(selectedImageFile);
+                im = new Image(selectedImageFile.toURI().toString());
                 selectedImageFile = null;
                 imagePreview.setImage(null);
+                controller.processUserInput(text.getText(), im);
+            } else if (selectedImageFile == null) {
+                controller.processUserInput(text.getText(), null);
             }
-            controller.processUserInput(text.getText());
+            im =null;
             text.setText("");
         });
 
@@ -367,5 +377,8 @@ public class JfxView {
 
         input.getChildren().addAll(text, send, fileButton);
         return input;
+    }
+
+    public void displayMessages(File imageFile, String user, String messageIdUser) {
     }
 }
