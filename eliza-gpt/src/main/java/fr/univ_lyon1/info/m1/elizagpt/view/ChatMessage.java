@@ -37,11 +37,34 @@ public class ChatMessage {
         this.author = author;
         this.image = i;
         if (i != null) {
-            i.setFitWidth(80);
-            i.setFitHeight(80);
+            i.setFitWidth(120);
+            i.setFitHeight(120);
         }
         this.date = date;
         this.style = style;
+    }
+
+    /**
+     * Constructeur de copie.
+     *
+     * @param otherMessage Le ChatMessage à partir duquel copier les valeurs.
+     */
+    public ChatMessage(final ChatMessage otherMessage) {
+        this.id = otherMessage.id;
+        this.text = otherMessage.text;
+        this.image = (otherMessage.image != null) ? new ImageView(otherMessage.image.getImage()) : null;
+        if (otherMessage.image != null) {
+            this.image = new ImageView(otherMessage.image.getImage());
+            if (this.image != null) {
+                this.image.setFitWidth(120);
+                this.image.setFitHeight(120);
+            }
+        } else {
+            this.image = null;
+        }
+        this.author = otherMessage.author;
+        this.date = otherMessage.date;
+        this.style = otherMessage.style;
     }
 
 

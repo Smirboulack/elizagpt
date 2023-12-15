@@ -343,7 +343,7 @@ public class JfxView {
             } else if (selectedImageFile == null) {
                 controller.processUserInput(text.getText(), null);
             }
-            im =null;
+            im = null;
             text.setText("");
         });
 

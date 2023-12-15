@@ -44,7 +44,6 @@ public class ImageRule implements IResponseRule {
      */
     public String generateResponse(final String input, final Image imageFile, final MessageProcessor processor) {
         if(input.isEmpty() && imageFile != null) { //S'il y a une image et pas de texte
-            System.out.println("ImageRule: Image sans texte");
             return processor.pickRandom(new String[] {
                     "Pas mal tout ça !",
                     "C'est une belle image",
@@ -52,7 +51,6 @@ public class ImageRule implements IResponseRule {
             });
         }
         if (input != null && imageFile != null) { //S'il y a du texte et une image
-            System.out.println("ImageRule: Image avec texte");
             return "Tais toi et laisse moi comtempler cette art !";
         }
         return input;

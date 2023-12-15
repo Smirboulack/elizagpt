@@ -87,10 +87,7 @@ public class MessageController {
             int idu = model.getRandom().nextInt();
             int ide = model.getRandom().nextInt();
 
-            System.out.println("input: "+input+" image: "+imageFile);
-
             if (imageFile != null) { // S'il y a une image
-                System.out.println("ProcessUserInput: avec Image");
                 i = new ImageView(imageFile);
                 ChatMessage message = new ChatMessage(idu, input, i, "user",
                         DateUtils.addSeconds(new java.util.Date(), 0).toString(),
@@ -99,12 +96,11 @@ public class MessageController {
                         new ChatMessage(ide, model.generateResponseForImage(model.normalize(input), imageFile), null, "eliza",
                                 DateUtils.addSeconds(new java.util.Date(), 0).toString(), ChatMessage.ELIZA_STYLE);
                 for (JfxView v : views) {
-                    v.getMessages().add(message);
+                    v.getMessages().add(new ChatMessage(message));
                     v.getMessages().add(response);
                     v.displayMessages();
                 }
             } else if (imageFile == null) { // S'il n'y a pas d'image
-                System.out.println("ProcessUserInput: sans Image");
                 ChatMessage message = new ChatMessage(idu, input, null, "user",
                         DateUtils.addSeconds(new java.util.Date(), 0).toString(),
                         ChatMessage.USER_STYLE);

@@ -118,10 +118,8 @@ public class MessageProcessor {
      * @return The response (String).
      */
     public String generateResponse(final String input) {
-        System.out.println("MessageProcesseur: simple");
         for (IResponseRule rule : responseRules) {
             if (rule.appliesTo(input, this)) {
-                System.out.println(rule);
                 return rule.generateResponse(input, this);
             }
         }
@@ -130,7 +128,6 @@ public class MessageProcessor {
 
 
     public String generateResponseForImage(final String input, final Image imageFile) {
-        System.out.println("MessageProcesseur: ForImage");
         ImageRule i = new ImageRule();
         return i.generateResponse(input, imageFile, this);
     }
