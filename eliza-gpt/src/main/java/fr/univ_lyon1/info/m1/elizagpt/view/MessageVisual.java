@@ -93,7 +93,7 @@ public class MessageVisual {
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
 
         // Créer un ImageView pour l'image
-        Image image = new Image(message[3]);
+        Image image = new Image("file:" + message[3]);
         this.imageView = new ImageView(image);
         imageView.setFitHeight(100);
         imageView.setFitWidth(100);
@@ -136,7 +136,7 @@ public class MessageVisual {
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
 
         // Créer un ImageView pour l'image
-        Image image = new Image(messageUrl);
+        Image image = new Image("file:" + messageUrl);
         this.imageView = new ImageView(image);
         imageView.setFitHeight(100);
         imageView.setFitWidth(100);
