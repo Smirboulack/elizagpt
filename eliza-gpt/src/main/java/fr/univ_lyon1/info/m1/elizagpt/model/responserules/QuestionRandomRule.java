@@ -31,10 +31,9 @@ public class QuestionRandomRule implements IResponseRule {
      */
     @Override
     public String generateResponse(final String input, final Processor processor) {
-        String response = processor.pickRandom(new String[] {
+        return processor.pickRandom(new String[] {
                 "Je vous renvoie la question.",
                 "Ici, c'est moi qui pose les questions."
         });
-        return response;
     }
 }

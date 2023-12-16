@@ -5,7 +5,7 @@ package fr.univ_lyon1.info.m1.elizagpt.view;
  * Class representing a chat message.
  */
 public class Message {
-    private int id;
+    private final int id;
     private String text;
     private String author;
     private String date;
@@ -20,11 +20,11 @@ public class Message {
     /**
      * Constructor.
      * 
-     * @param idm
-     * @param text
-     * @param author
-     * @param date
-     * @param style
+     * @param idm the id of the message
+     * @param text the text of the message
+     * @param author the author of the message
+     * @param date the date of the message
+     * @param style the style of the message
      */
     public Message(final int idm, final String text, final String author, final String date,
             final String style) {

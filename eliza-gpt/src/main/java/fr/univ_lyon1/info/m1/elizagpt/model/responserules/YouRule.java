@@ -4,8 +4,12 @@ import com.opencsv.exceptions.CsvValidationException;
 import java.util.regex.Pattern;
 import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 
-public class YouRule implements IResponseRule{
-        /**
+/**.
+ * Interface for a rule that generates a response to the input "Vous .*"
+ */
+public class YouRule implements IResponseRule {
+
+    /**.
      * Check if the rule applies to the input.
      * 
      * @param input le message à envoyer
@@ -14,9 +18,8 @@ public class YouRule implements IResponseRule{
      */
     @Override
     public boolean appliesTo(final String input, final Processor processor) {
-        boolean pattern1 = Pattern.compile("(Vous .*)", Pattern.CASE_INSENSITIVE)
+        return Pattern.compile("(Vous .*)", Pattern.CASE_INSENSITIVE)
                 .matcher(input).matches();
-        return pattern1;
     }
 
     /**

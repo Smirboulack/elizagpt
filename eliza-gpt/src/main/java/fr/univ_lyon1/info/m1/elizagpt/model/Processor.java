@@ -108,6 +108,13 @@ public class Processor {
         return processedText;
     }
 
+    /**
+     * .
+     * Normalize the given text by verbs by the right conjugation and the right pronoun
+     *
+     * @param text The text to normalize.
+     * @return The normalized text.
+     */
     public String secondToFirstPerson(final String text) throws CsvValidationException {
         String processedText = text;
 

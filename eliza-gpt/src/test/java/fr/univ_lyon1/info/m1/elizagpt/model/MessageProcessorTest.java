@@ -5,7 +5,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import org.hamcrest.*;
 
 import java.util.Arrays;
 
@@ -36,6 +35,7 @@ public class MessageProcessorTest {
 
             assertThat(responseAttendu, is(true));
         }
+
         /* assertThat(p.firstToSecondPerson("Je pense à mon chien."),
                 is("vous pensez à votre chien."));
 
@@ -69,7 +69,7 @@ public class MessageProcessorTest {
         Processor p = new Processor();
 
         String q = "Quel est mon nom ?";
-        String[] re = {"Je ne connais pas votre nom.", "Votre nom est "+p.getName()+"."};
+        String[] re = {"Je ne connais pas votre nom.", "Votre nom est " + p.getName() + "."};
 
         String response = p.generateResponse(q);
         System.out.println("Input: " + q);
@@ -88,7 +88,7 @@ public class MessageProcessorTest {
         Processor p = new Processor();
 
         String q = "Je m'appelle (.*)\\.";
-        String attendu = "Bonjour $1\\."; // Utilisation de $1 pour faire référence au groupe capturé dans la regex
+        String attendu = "Bonjour (.*)\\.";
         String response = p.generateResponse(q);
 
         assertThat("Input: " + q + ", Generated Response: " + response,
@@ -100,7 +100,7 @@ public class MessageProcessorTest {
 
         String q = ".*?.*";
         String response = p.generateResponse(q);
-        String[] re = {"Ici, c'est moi qui pose les questions", "Je vous renvoie la question."};
+        String[] re = {"Ici, c'est moi qui pose les questions.", "Je vous renvoie la question."};
 
         assertThat(Arrays.asList(re), hasItem(response));
     }

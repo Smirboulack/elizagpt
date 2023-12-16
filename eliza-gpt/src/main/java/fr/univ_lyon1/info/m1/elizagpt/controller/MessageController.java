@@ -22,16 +22,17 @@ import javafx.util.StringConverter;
  * Main class of the controller.
  */
 public class MessageController {
-    private Processor model;
-    private List<JfxView> views;
-    private ObservableList<SearchStrategy> listeObservable = FXCollections.observableArrayList();
+    private final Processor model;
+    private final List<JfxView> views;
+    private final ObservableList<SearchStrategy> listeObservable
+            = FXCollections.observableArrayList();
     private SearchStrategy currentSearchStrategy;
     private boolean isChatStateSaved = false;
 
     /**
      * Constructor.
      * 
-     * @param view
+     * @param view the view to assigne
      */
     public MessageController(final List<JfxView> view) {
         this.model = new Processor();
@@ -47,8 +48,10 @@ public class MessageController {
      * Load all the search strategies.
      */
     public void chargerStrategies() {
-        Reflections reflections = new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
-        Set<Class<? extends SearchStrategy>> classes = reflections.getSubTypesOf(SearchStrategy.class);
+        Reflections reflections =
+                new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
+        Set<Class<? extends SearchStrategy>> classes
+                = reflections.getSubTypesOf(SearchStrategy.class);
 
         for (Class<? extends SearchStrategy> classe : classes) {
             try {
@@ -60,6 +63,10 @@ public class MessageController {
         }
     }
 
+    /**.
+     *
+     * @param view the view ti initialize
+     */
     public void initializeComboBox(final JfxView view) {
         view.getComboBox().setItems(listeObservable);
         view.getComboBox().setConverter(new StringConverter<SearchStrategy>() {
@@ -80,7 +87,7 @@ public class MessageController {
     /**
      * Change the current search strategy.
      * 
-     * @param newValue
+     * @param newValue the new strategy used to search
      */
     public void changeSearchStrategy(final SearchStrategy newValue) {
         this.currentSearchStrategy = newValue;
@@ -94,7 +101,7 @@ public class MessageController {
      * Process the sended message, generate a response and call the view to display
      * it.
      * 
-     * @param input
+     * @param input the message
      */
     public void processUserInput(final String input) {
         if (input == null || input.isEmpty()) {
@@ -118,7 +125,7 @@ public class MessageController {
     /**
      * Process the receveid message.
      * 
-     * @param message
+     * @param message the message to delete
      */
     public void deleteMessageViews(final Message message) {
         for (JfxView v : views) {
@@ -159,7 +166,7 @@ public class MessageController {
     /**
      * Search a text in the chat.
      * 
-     * @param text
+     * @param text the text to search in the history chat
      */
     public void searchText(final String text) {
         if (text == null || text.isEmpty() || currentSearchStrategy == null) {
@@ -189,6 +196,10 @@ public class MessageController {
         isChatStateSaved = false;
     }
 
+    /**.
+     *
+     * @param theme the dark or white theme selected
+     */
     public void changeViewsTheme(final String theme) {
         for (JfxView view : views) {
             if (theme.equals("Light")) {

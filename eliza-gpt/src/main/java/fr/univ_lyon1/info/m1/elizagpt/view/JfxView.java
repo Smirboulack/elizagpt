@@ -26,7 +26,7 @@ import javafx.stage.Stage;
  */
 public class JfxView {
     private VBox dialog;
-    final VBox root;
+    private final VBox root;
     private List<Message> messages = new ArrayList<>();
     private List<Message> messagesSaved = new ArrayList<>();
     private TextField text = null;
@@ -34,11 +34,11 @@ public class JfxView {
     private Label searchTextLabel = null;
     private ComboBox<SearchStrategy> strategySelect;
     private MessageController controller;
-    private ImageView imagePreview;
+    private final ImageView imagePreview;
     private File selectedImageFile;
     private final Image trashImage;
-    Button themeToggleButton;
-    ImageView toggleImageView;
+    private Button themeToggleButton;
+    private ImageView toggleImageView;
 
     /**
      * Main class of the View (GUI) of the application.
@@ -82,7 +82,7 @@ public class JfxView {
     /**
      * Set the controller of the view.
      * 
-     * @param controller
+     * @param controller the controller for the view
      */
     public void setController(final MessageController controller) {
         this.controller = controller;
@@ -99,11 +99,15 @@ public class JfxView {
         }
     }
 
-    public void displayMessage(Message message) {
+    /**.
+     * Display all messages
+     * @param message the message to display
+     */
+    public void displayMessage(final Message message) {
         dialog.getChildren().add(createMessageVisual(message));
     }
 
-    private VBox createMessageVisual(Message message) {
+    private VBox createMessageVisual(final Message message) {
         Label timeLabel = new Label(message.getDate());
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
 
@@ -157,7 +161,7 @@ public class JfxView {
     /**
      * Update the text of the search label.
      * 
-     * @param text
+     * @param text the text
      */
     public void updateSearchLabel(final String text) {
         searchTextLabel.setText(text);
@@ -166,14 +170,15 @@ public class JfxView {
     /**
      * Return the search text label.
      * 
-     * @return
+     * @return searchTextLabel
      */
     public Label getSearchTextLabel() {
         return searchTextLabel;
     }
 
-    /*
+    /**.
      * return the text of the search text field.
+     * @return text
      */
     public String getInputText() {
         return text.getText();
@@ -196,7 +201,7 @@ public class JfxView {
     /**
      * Return the dialog.
      * 
-     * @return
+     * @return the VBox dialog
      */
     public VBox getDialog() {
         return dialog;
@@ -351,11 +356,13 @@ public class JfxView {
         });
 
         // Ajouter le bouton en haut à droite
-        HBox topRightBox = new HBox(themeToggleButton);
 
-        return topRightBox;
+        return new HBox(themeToggleButton);
     }
 
+    /**.
+     * Turn the application to the white theme
+     */
     public void whiteTheme() {
         this.themeToggleButton.setText("Dark");
         this.toggleImageView.setImage(new Image("file:src/main/resources/moon.png"));
@@ -363,6 +370,9 @@ public class JfxView {
         this.dialog.setStyle(null);
     }
 
+    /**.
+     * Turn the application to the dark theme
+     */
     public void darkTheme() {
         this.themeToggleButton.setText("Light");
         this.toggleImageView.setImage(new Image("file:src/main/resources/sun.png"));
