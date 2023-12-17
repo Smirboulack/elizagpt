@@ -2,6 +2,8 @@ package fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy;
 
 /**
  * Interface for the search strategies by substring.
+ * 
+ * @see SearchStrategy
  */
 public class Substring implements SearchStrategy {
 

@@ -4,28 +4,33 @@ import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 import java.util.regex.Pattern;
 
 /**
- * Interface for a rule that generates a response.
+ * Interface for a rule that generates a response for a message containing an
+ * image and a text.
+ * 
+ * The message must be of the form "text: <text> image: <image>".
+ * 
+ * @see IResponseRule
  */
 public class ImageTextRule implements IResponseRule {
     /**
      * Check if the rule applies to the input.
      *
-     * @param input     le message à envoyer
-     * @param processor le modèle
-     * @return le résultat de la vérification
+     * @param input     the message to check
+     * @param processor the model
+     * @return true if the rule applies, false otherwise
      */
     @Override
     public boolean appliesTo(final String input, final Processor processor) {
-        return Pattern.compile("text\\s*:\\s*.*\\s*image\\s*:\\s*.*", Pattern.CASE_INSENSITIVE)
-                .matcher(input).matches();
+        String regex = "text\\s*:\\s*.*\\s*image\\s*:\\s*.+\\.(png|jpeg|jpg|svg|bmp)$";
+        return Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(input).matches();
     }
 
     /**
      * Generate a response.
      *
-     * @param input     le message à envoyer
-     * @param processor le modèle
-     * @return la réponse générée
+     * @param input     The input to generate a response for.
+     * @param processor the model
+     * @return The generated response.
      */
     @Override
     public String generateResponse(final String input, final Processor processor) {

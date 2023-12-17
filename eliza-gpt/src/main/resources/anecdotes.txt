@@ -1,0 +1,3 @@
+"Saviez-vous que le premier programme d'intelligence artificielle a été développé dans les années 1950 ? Il s'appelait Logic Theorist et a été conçu pour imiter le raisonnement humain.",
+"L'une des premières IA à passer le test de Turing était un programme nommé ELIZA, qui simulait un psychothérapeute.",
+"En 2016, une IA nommée AlphaGo a battu un champion du monde de Go, un jeu ancien et complexe, marquant un tournant majeur dans le développement de l'IA."

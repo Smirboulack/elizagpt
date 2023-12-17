@@ -26,7 +26,7 @@ import javafx.util.StringConverter;
  */
 public class MainView {
     private VBox dialog;
-    final VBox root;
+    private final VBox root;
     private TextField text = null;
     private TextField searchText = null;
     private Label searchTextLabel = null;
@@ -34,8 +34,8 @@ public class MainView {
     private MainController controller;
     private final ImageView imagePreview;
     private File selectedImageFile;
-    Button themeToggleButton;
-    ImageView toggleImageView;
+    private Button themeToggleButton;
+    private ImageView toggleImageView;
     private MessageVisual messageVisual;
 
     /**
@@ -77,6 +77,11 @@ public class MainView {
         stage.show();
     }
 
+    /**
+     * Sets the MainController associated with the MainView.
+     *
+     * @param controller The MainController associated with the MainView.
+     */
     public void setController(final MainController controller) {
         this.controller = controller;
 
@@ -90,9 +95,11 @@ public class MainView {
     }
 
     /**
-     * Displays a text message visual in the dialog using the provided message parts.
+     * Displays a text message visual in the dialog using the provided message
+     * parts.
      *
-     * @param parts An array of String parts representing the components of the text message.
+     * @param parts An array of String parts representing the components of the text
+     *              message.
      */
     public void displayTxtMessage(final String[] parts) {
         MessageVisual messageVisual = MessageVisual.getInstance(controller);
@@ -101,9 +108,11 @@ public class MainView {
     }
 
     /**
-     * Displays an image message visual in the dialog using the provided message parts.
+     * Displays an image message visual in the dialog using the provided message
+     * parts.
      *
-     * @param parts An array of String parts representing the components of the image message.
+     * @param parts An array of String parts representing the components of the
+     *              image message.
      */
     public void displayImageMessage(final String[] parts) {
         MessageVisual messageVisual = MessageVisual.getInstance(controller);
@@ -114,9 +123,9 @@ public class MainView {
     /**
      * Displays a combined message visual.
      *
-     * @param parts       An array of String parts representing the components
-     *                    of the combined message.
-     * @param messageUrl  The URL of the image associated with the combined message.
+     * @param parts      An array of String parts representing the components
+     *                   of the combined message.
+     * @param messageUrl The URL of the image associated with the combined message.
      */
     public void displayCombinedMessage(final String[] parts, final String messageUrl) {
         MessageVisual messageVisual = MessageVisual.getInstance(controller);
@@ -160,7 +169,8 @@ public class MainView {
 
     /**
      * Initializes the ComboBox with the list of SearchStrategy items.
-     * Associates the ComboBox with the provided ObservableList, sets up the converter
+     * Associates the ComboBox with the provided ObservableList, sets up the
+     * converter
      * for displaying strategy names, and selects the first strategy by default.
      *
      * @param listeObservable The ObservableList containing
@@ -203,7 +213,6 @@ public class MainView {
                     new FileChooser.ExtensionFilter("All Images", "*.*"),
                     new FileChooser.ExtensionFilter("JPG", "*.jpg"),
                     new FileChooser.ExtensionFilter("PNG", "*.png"),
-                    new FileChooser.ExtensionFilter("GIF", "*.gif"),
                     new FileChooser.ExtensionFilter("BMP", "*.bmp"),
                     new FileChooser.ExtensionFilter("JPEG", "*.jpeg"),
                     new FileChooser.ExtensionFilter("SVG", "*.svg")
@@ -238,6 +247,9 @@ public class MainView {
         return input;
     }
 
+    /**
+     * Create the dark mode button.
+     */
     private HBox darkModBox() {
         // Chargement des images
         Image moonImage = new Image("file:src/main/resources/moon.png");
@@ -266,8 +278,8 @@ public class MainView {
         return new HBox(themeToggleButton);
     }
 
-    /**.
-     * Used to modify items from dark theme to white theme
+    /**
+     * Used to modify items from dark theme to white theme.
      */
     public void whiteTheme() {
         this.themeToggleButton.setText("Dark");
@@ -276,7 +288,8 @@ public class MainView {
         this.dialog.setStyle(null);
     }
 
-    /**.
+    /**
+     * .
      * Used to modify items from white theme to dark theme
      */
     public void darkTheme() {
@@ -334,38 +347,82 @@ public class MainView {
         text.setText("");
     }
 
+    /**
+     * Return the ComboBox.
+     * 
+     * @return the ComboBox.
+     */
     public ComboBox<SearchStrategy> getComboBox() {
         return strategySelect;
     }
 
+    /**
+     * Set the ComboBox.
+     * 
+     */
     public void setComboBox(final ComboBox<SearchStrategy> comboBox) {
         this.strategySelect = comboBox;
     }
 
+    /**
+     * Return the dialog.
+     * 
+     * @return the dialog.
+     */
     public VBox getDialog() {
         return dialog;
     }
 
+    /**
+     * Set the dialog.
+     * 
+     * @param dialog
+     */
     public void setDialog(final VBox dialog) {
         this.dialog = dialog;
     }
 
+    /**
+     * Return the root.
+     * 
+     * @return the root.
+     */
     public VBox getRoot() {
         return root;
     }
 
+    /**
+     * Return the theme toggle button.
+     * 
+     * @return themeToggleButton
+     */
     public Button getThemeToggleButton() {
         return themeToggleButton;
     }
 
+    /**
+     * Set the theme toggle button.
+     * 
+     * @param themeToggleButton
+     */
     public void setThemeToggleButton(final Button themeToggleButton) {
         this.themeToggleButton = themeToggleButton;
     }
 
+    /**
+     * Return the toggle image view.
+     * 
+     * @return toggleImageView
+     */
     public ImageView getToggleImageView() {
         return toggleImageView;
     }
 
+    /**
+     * Set the toggle image view.
+     * 
+     * @param toggleImageView
+     */
     public void setToggleImageView(final ImageView toggleImageView) {
         this.toggleImageView = toggleImageView;
     }

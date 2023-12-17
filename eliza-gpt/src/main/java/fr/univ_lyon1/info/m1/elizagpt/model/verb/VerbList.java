@@ -15,7 +15,7 @@ import com.opencsv.exceptions.CsvValidationException;
  */
 public class VerbList {
 
-    private static final List<Verb> verbs = new ArrayList<>();
+    private static List<Verb> verbs;
 
     /**
      * Constructor.
@@ -23,6 +23,7 @@ public class VerbList {
      * @throws CsvValidationException l'exception
      */
     public VerbList() throws CsvValidationException {
+        verbs = new ArrayList<>();
         loadVerbsFromCSV("src/main/resources/french-verb-conjugation.csv");
     }
 
@@ -109,7 +110,8 @@ public class VerbList {
     }
 
     /**
-     * Convert a verb from second-person plural to first-person singular conjugation.
+     * Convert a verb from second-person plural to first-person singular
+     * conjugation.
      *
      * @param verb The verb in second-person plural conjugation.
      * @return The verb in first-person singular conjugation.
@@ -124,8 +126,7 @@ public class VerbList {
 
     /**
      * .
-     * Replace possessive pronouns in the given text with their corresponding
-     * English conjugations.
+     * Replace possessive pronouns in the given text with their corresponding form.
      *
      * @param text The text to process.
      * @return The text with possessive pronouns replaced.

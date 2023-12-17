@@ -5,15 +5,17 @@ import java.util.regex.Pattern;
 import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 
 /**
- * Interface for a rule that generates a response.
+ * Interface for a rule that generates a default response to any question.
+ * 
+ * @see IResponseRule
  */
 public class QuestionRandomRule implements IResponseRule {
     /**
      * Check if the rule applies to the input.
      *
-     * @param input le message à envoyer
-     * @param processor le modèle
-     * @return le résultat de la vérification
+     * @param input     the message to check
+     * @param processor the model
+     * @return true if the rule applies, false otherwise
      */
     @Override
     public boolean appliesTo(final String input, final Processor processor) {
@@ -25,9 +27,9 @@ public class QuestionRandomRule implements IResponseRule {
     /**
      * Generate a response.
      *
-     * @param input le message à envoyer
-     * @param processor le modèle
-     * @return le réponse générée
+     * @param input     The input to generate a response for.
+     * @param processor the model
+     * @return The generated response.
      */
     @Override
     public String generateResponse(final String input, final Processor processor) {

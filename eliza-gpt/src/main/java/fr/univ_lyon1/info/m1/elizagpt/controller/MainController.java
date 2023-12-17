@@ -19,26 +19,29 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.VBox;
 
-/**.
- * The MainController class coordinates interactions between views end the model.
+/**
+ * .
+ * The MainController class coordinates interactions between views end the
+ * model.
  * It manages every input and update views.
  */
 public class MainController {
     private final Processor model;
     private final List<MainView> views;
-    private final ObservableList<SearchStrategy> listeObservable
-            = FXCollections.observableArrayList();
+    private final ObservableList<SearchStrategy> listeObservable; 
     private SearchStrategy currentSearchStrategy;
     private final List<Message> messagesSaved;
 
     /**
-     * Constructor.
+     * Constructor for the MainController.
+     * It initialize the model and the views.
      * 
      * @param view the list of views associated to this controller
      */
     public MainController(final List<MainView> view) {
         this.model = new Processor();
         this.views = view;
+        this.listeObservable = FXCollections.observableArrayList();
         this.chargerStrategies();
         this.messagesSaved = new ArrayList<>();
         Message helloMessage = new TxtMessage("0", "eliza",
@@ -54,12 +57,15 @@ public class MainController {
 
     /**
      * Load all the search strategies.
+     * 
+     * @throws Exception the exception
+     * @see Reflections
      */
     public void chargerStrategies() {
-        Reflections reflections =
-                new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
-        Set<Class<? extends SearchStrategy>> classes
-                = reflections.getSubTypesOf(SearchStrategy.class);
+        Reflections reflections = 
+        new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
+        Set<Class<? extends SearchStrategy>> classes = 
+        reflections.getSubTypesOf(SearchStrategy.class);
 
         for (Class<? extends SearchStrategy> classe : classes) {
             try {
@@ -80,17 +86,21 @@ public class MainController {
         this.currentSearchStrategy = newValue;
     }
 
-    /**.
+    /**
+     * .
      * Getter for listeObservable
+     * 
      * @return listeObservable
      */
     public ObservableList<SearchStrategy> getListeObservable() {
         return listeObservable;
     }
 
-    /**.
+    /**
+     * .
      * The process which executed after user inputs it message
-     * @param input the text message
+     * 
+     * @param input     the text message
      * @param imagePath the path for the image (if an image is send)
      */
     public void processUserInput(final String input, final File imagePath) {
@@ -107,9 +117,11 @@ public class MainController {
         updateViews(message, response);
     }
 
-    /**.
+    /**
+     * .
      * Create the appropriate message according what is send
-     * @param input the text message
+     * 
+     * @param input     the text message
      * @param imagePath the path for the image (if an image is send)
      * @return the appropriate Message
      */
@@ -130,9 +142,11 @@ public class MainController {
         }
     }
 
-    /**.
+    /**
+     * .
      * Create the appropriate response according to the user message
-     * @param input the text message
+     * 
+     * @param input     the text message
      * @param imagePath the path for the image (if an image is send)
      * @return the response Message
      */
@@ -152,10 +166,12 @@ public class MainController {
                 DateUtils.addSeconds(new java.util.Date(), 0).toString(), responseText);
     }
 
-    /**.
+    /**
+     * .
      * Updating every views after a message and it response
-     * @param message the message of the user
-     * @param response the response for the previous  message
+     * 
+     * @param message  the message of the user
+     * @param response the response for the previous message
      */
     private void updateViews(final Message message, final Message response) {
         for (MainView view : views) {
@@ -174,7 +190,7 @@ public class MainController {
     }
 
     /**
-     * Process the receveid message.
+     * Deletes the message with the given id.
      * 
      * @param messageId the id message to delete
      */
@@ -190,6 +206,7 @@ public class MainController {
      * Search a text in the chat.
      * 
      * @param text the text to search
+     * @see SearchStrategy
      */
     public void searchText(final String text) {
         // saveChatState();
@@ -207,7 +224,7 @@ public class MainController {
     }
 
     /**
-     * Undo the search.
+     * Undo the search and display the chat as it was before the search.
      */
     public void undoSearch() {
         for (MainView view : views) {
@@ -225,8 +242,10 @@ public class MainController {
         }
     }
 
-    /**.
+    /**
+     * .
      * Switch from dark to white theme and vice versa
+     * 
      * @param theme the theme to switch
      */
     public void changeViewsTheme(final String theme) {

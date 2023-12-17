@@ -4,15 +4,17 @@ import java.util.regex.Pattern;
 import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 
 /**
- * Interface for a rule that generates a response.
+ * Interface for a rule that generates a response when the user asks for his name.
+ * 
+ * @see IResponseRule
  */
 public class WhatsNameRule implements IResponseRule {
     /**
      * Check if the rule applies to the input.
      *
-     * @param input     le message à envoyer
-     * @param processor le modèle
-     * @return le résultat de la vérification
+     * @param input     the message to check
+     * @param processor the model
+     * @return true if the rule applies, false otherwise
      */
     @Override
     public boolean appliesTo(final String input, final Processor processor) {
@@ -20,7 +22,7 @@ public class WhatsNameRule implements IResponseRule {
                 .matcher(input)
                 .matches();
         boolean pat2 = Pattern.compile("Comment je m'appelle\\s*\\?\\s*.*$",
-                        Pattern.CASE_INSENSITIVE)
+                Pattern.CASE_INSENSITIVE)
                 .matcher(input)
                 .matches();
         return pat1 || pat2;
@@ -29,9 +31,9 @@ public class WhatsNameRule implements IResponseRule {
     /**
      * Generate a response.
      *
-     * @param input     le message à envoyer
-     * @param processor le modèle
-     * @return le réponse générée
+     * @param input     The input to generate a response for.
+     * @param processor the model
+     * @return The generated response.
      */
     @Override
     public String generateResponse(final String input, final Processor processor) {

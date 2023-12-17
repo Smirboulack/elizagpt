@@ -10,7 +10,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
- * Represents the visual representation of a message, including text and image components.
+ * Represents the visual representation of a message, including text and image
+ * components.
+ * This class is a singleton.
+ * It is associated with a MainController.
  */
 public final class MessageVisual {
     private static MessageVisual instance;
@@ -25,7 +28,11 @@ public final class MessageVisual {
     public static final String USER_STYLE = "-fx-background-color: #A0E0A0; " + BASE_STYLE;
     public static final String ELIZA_STYLE = "-fx-background-color: #A0A0E0; " + BASE_STYLE;
 
-    // Le constructeur est privé
+    /**
+     * Private constructor.
+     *
+     * @param controller The MainController associated with the instance.
+     */
     private MessageVisual(final MainController controller) {
         this.messageVisual = new VBox();
         this.imageView = null;
@@ -34,7 +41,8 @@ public final class MessageVisual {
     }
 
     /**
-     * Gets the singleton instance of MessageVisual associated with the provided MainController.
+     * Gets the singleton instance of MessageVisual associated with the provided
+     * MainController.
      *
      * @param controller The MainController associated with the instance.
      * @return The MessageVisual instance.
@@ -65,19 +73,21 @@ public final class MessageVisual {
     }
 
     /**
-     * Creates and displays the visual representation of a text message in the dialog.
+     * Creates and displays the visual representation of a text message in the
+     * dialog.
      *
-     * @param message An array of String parts representing the components of the text message.
+     * @param message An array of String parts representing the components of the
+     *                text message.
      */
     public void createTxtMessageVisual(final String[] message) {
-
+        // Label for the time
         Label timeLabel = new Label(message[2]);
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
 
-        // HBox pour le message
+        // HBox for the message
         HBox outerHBox = new HBox();
 
-        // Style et contenu du message
+        // Style and content of the message
         HBox innerHBox = new HBox(5.0);
         innerHBox.setStyle(message[1].equals("user") ? USER_STYLE : ELIZA_STYLE);
         Label messageLabel = new Label(message[3]);
@@ -96,7 +106,8 @@ public final class MessageVisual {
         VBox messageContainer = new VBox(2);
         messageContainer.getChildren().add(timeLabel);
         messageContainer.setAlignment(message[1].equals("user")
-                ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+                ? Pos.CENTER_RIGHT
+                : Pos.CENTER_LEFT);
 
         HBox container = new HBox(5);
         messageContainer.setId(message[0]);
@@ -104,30 +115,32 @@ public final class MessageVisual {
         container.setAlignment(message[1].equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
         messageContainer.getChildren().add(container);
-
         messageVisual = messageContainer;
 
     }
 
     /**
-     * Creates and displays the visual representation of an image message in the dialog.
+     * Creates and displays the visual representation of an image message in the
+     * dialog.
      *
-     * @param message An array of String parts representing the components of the image message.
+     * @param message An array of String parts representing the components of the
+     *                image message.
      */
     public void createImageMessageVisual(final String[] message) {
+        // Label for the time
         Label timeLabel = new Label(message[2]);
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
 
-        // Créer un ImageView pour l'image
+        // Creates an ImageView for the image
         Image image = new Image("file:" + message[3]);
         this.imageView = new ImageView(image);
         imageView.setFitHeight(100);
         imageView.setFitWidth(100);
 
-        // HBox pour le message
+        // HBox for the message
         HBox outerHBox = new HBox();
 
-        // Style et contenu du message
+        // Style and content of the message
         HBox innerHBox = new HBox(5.0);
         innerHBox.setStyle(message[1].equals("user") ? USER_STYLE : ELIZA_STYLE);
         innerHBox.getChildren().add(imageView);
@@ -144,7 +157,8 @@ public final class MessageVisual {
         VBox messageContainer = new VBox(2);
         messageContainer.getChildren().add(timeLabel);
         messageContainer.setAlignment(message[1].equals("user")
-                ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+                ? Pos.CENTER_RIGHT
+                : Pos.CENTER_LEFT);
 
         HBox container = new HBox(5);
         messageContainer.setId(message[0]);
@@ -152,7 +166,6 @@ public final class MessageVisual {
         container.setAlignment(message[1].equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
         messageContainer.getChildren().add(container);
-
         messageVisual = messageContainer;
     }
 
@@ -160,23 +173,25 @@ public final class MessageVisual {
      * Creates and displays the visual representation of a combined message
      * with text and image in the dialog.
      *
-     * @param message An array of String parts representing the components of the combined message.
+     * @param message    An array of String parts representing the components of the
+     *                   combined message.
      * @param messageUrl The URL of the image associated with the combined message.
      */
     public void createCombinedMessageVisual(final String[] message, final String messageUrl) {
+        // Label for the time
         Label timeLabel = new Label(message[2]);
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
 
-        // Créer un ImageView pour l'image
+        // Creates an ImageView for the image
         Image image = new Image("file:" + messageUrl);
         this.imageView = new ImageView(image);
         imageView.setFitHeight(100);
         imageView.setFitWidth(100);
 
-        // HBox pour le message
+        // HBox for the message
         HBox outerHBox = new HBox();
 
-        // Style et contenu du message
+        // Style and content of the message
         HBox innerHBox = new HBox(5.0);
         innerHBox.setStyle(message[1].equals("user") ? USER_STYLE : ELIZA_STYLE);
         Label messageLabel = new Label(message[3]);
@@ -196,7 +211,8 @@ public final class MessageVisual {
         VBox messageContainer = new VBox(2);
         messageContainer.getChildren().add(timeLabel);
         messageContainer.setAlignment(message[1].equals("user")
-                ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+                ? Pos.CENTER_RIGHT
+                : Pos.CENTER_LEFT);
 
         HBox container = new HBox(5);
         messageContainer.setId(message[0]);
@@ -204,7 +220,6 @@ public final class MessageVisual {
         container.setAlignment(message[1].equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
         messageContainer.getChildren().add(container);
-
         messageVisual = messageContainer;
     }
 

@@ -18,7 +18,6 @@ import fr.univ_lyon1.info.m1.elizagpt.model.verb.VerbList;
  * Logic to process a message (and probably reply to it).
  */
 public class Processor {
-    // private List<HBox> messages;
     private String name;
     private final Random random = new Random();
     private VerbList verbList;
@@ -26,6 +25,8 @@ public class Processor {
 
     /**
      * Constructor.
+     * 
+     * @throws CsvValidationException l'exception
      */
     public Processor() {
         try {
@@ -39,12 +40,16 @@ public class Processor {
 
     /**
      * Load all the response rules dynamically.
+     * 
+     * @param configFilePath the path to the config file
+     * @return the list of rules
+     * @throws FileNotFoundException l'exception
      */
     public List<IResponseRule> loadRulesFromConfig(final String configFilePath) {
         List<IResponseRule> rules = new ArrayList<>();
         Properties props = new Properties();
 
-        // Charger le fichier properties à partir du classpath
+        // Load the config file from the classpath
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(configFilePath)) {
             if (input == null) {
                 throw new FileNotFoundException(
@@ -60,8 +65,9 @@ public class Processor {
                     String fullClassName = "fr.univ_lyon1.info.m1.elizagpt.model.responserules."
                             + className.trim();
                     Class<?> clazz = Class.forName(fullClassName);
-                    IResponseRule rule =
-                            (IResponseRule) clazz.getDeclaredConstructor().newInstance();
+                    IResponseRule rule = (IResponseRule) clazz
+                            .getDeclaredConstructor()
+                            .newInstance();
                     rules.add(rule);
                 } catch (ClassNotFoundException e) {
                     System.err.println("La classe " + className.trim() + " n'a pas été trouvée.");
@@ -140,7 +146,13 @@ public class Processor {
         return null;
     }
 
-    /** Pick an element randomly in the array. */
+    /**
+     * Pick an element randomly in the array.
+     * 
+     * @param <T>   The type of the array
+     * @param array The array to pick from
+     * @return The randomly picked element
+     */
     public <T> T pickRandom(final T[] array) {
         return array[random.nextInt(array.length)];
     }
@@ -157,7 +169,7 @@ public class Processor {
     /**
      * Set the name.
      * 
-     * @param name le nom de l'utilisateur
+     * @param name
      */
     public void setName(final String name) {
         this.name = name;
@@ -165,15 +177,27 @@ public class Processor {
 
     /**
      * Get random.
+     * 
+     * @return random
      */
     public Random getRandom() {
         return random;
     }
 
+    /**
+     * Get for responseRules.
+     * 
+     * @return responseRules
+     */
     public List<IResponseRule> getResponseRules() {
         return responseRules;
     }
 
+    /**
+     * Set the responseRules.
+     * 
+     * @param responseRules
+     */
     public void setResponseRules(final List<IResponseRule> responseRules) {
         this.responseRules = responseRules;
     }

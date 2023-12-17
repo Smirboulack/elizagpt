@@ -4,16 +4,18 @@ import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 import java.util.regex.Pattern;
 
 /**
- * A response rule that generates a random response.
+ * A response rule that generates a response for an image only message.
+ * 
+ * @see IResponseRule
  */
 public class ImageRule implements IResponseRule {
 
     /**
      * Check if the rule applies to the input.
      *
-     * @param input     le message à envoyer
-     * @param processor le modèle
-     * @return le résultat de la vérification
+     * @param input     the message to check
+     * @param processor the model
+     * @return true if the rule applies, false otherwise
      */
     @Override
     public boolean appliesTo(final String input, final Processor processor) {
@@ -24,9 +26,9 @@ public class ImageRule implements IResponseRule {
     /**
      * Generate a response.
      *
-     * @param input     le message à envoyer
-     * @param processor le modèle
-     * @return la réponse générée
+     * @param input     The input to generate a response for.
+     * @param processor the model
+     * @return The generated response.
      */
     @Override
     public String generateResponse(final String input, final Processor processor) {
