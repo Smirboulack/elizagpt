@@ -1,4 +1,0 @@
-{
-    "java.checkstyle.configuration": "${workspaceFolder}\\eliza-gpt\\src\\main\\config\\checkstyle.xml",
-    "java.configuration.updateBuildConfiguration": "interactive"
-}
