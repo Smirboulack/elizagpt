@@ -15,7 +15,7 @@ public class MessageProcessorTest {
         Processor p = new Processor();
 
         // Then
-        String[] sp = {"J'", "Je ", "M'"};
+        String[] sp = {"J'", "Je "};
         String[] r = 
         {"Pourquoi dites-vous que ", "Pourquoi pensez-vous que ", "Êtes-vous sûr que "};
 

@@ -19,7 +19,8 @@ public class WhatsNameRule implements IResponseRule {
         boolean pat1 = Pattern.compile("Quel est mon nom\\s*\\?\\s*.*$", Pattern.CASE_INSENSITIVE)
                 .matcher(input)
                 .matches();
-        boolean pat2 = Pattern.compile("Comment je m'appelle\\s*\\?\\s*.*$", Pattern.CASE_INSENSITIVE)
+        boolean pat2 = Pattern.compile("Comment je m'appelle\\s*\\?\\s*.*$",
+                        Pattern.CASE_INSENSITIVE)
                 .matcher(input)
                 .matches();
         return pat1 || pat2;

@@ -50,7 +50,6 @@ public class App extends Application {
         views.add(view2);
         views.add(view3);
         MainController controller = new MainController(views);
-
     }
 
     /**

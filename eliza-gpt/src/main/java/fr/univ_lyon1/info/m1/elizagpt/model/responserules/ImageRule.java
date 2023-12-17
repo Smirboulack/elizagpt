@@ -17,9 +17,8 @@ public class ImageRule implements IResponseRule {
      */
     @Override
     public boolean appliesTo(final String input, final Processor processor) {
-        boolean pattern1 = Pattern.compile(".*\\.(png|jpg|jpeg|svg|gif)$", Pattern.CASE_INSENSITIVE)
+        return Pattern.compile(".*\\.(png|jpg|jpeg|svg|gif)$", Pattern.CASE_INSENSITIVE)
                 .matcher(input).matches();
-        return pattern1;
     }
 
     /**

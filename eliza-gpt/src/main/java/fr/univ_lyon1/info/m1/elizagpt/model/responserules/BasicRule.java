@@ -23,7 +23,9 @@ public class BasicRule implements IResponseRule {
                 .matcher(input).matches();
         boolean pattern2 = Pattern.compile("J'(?!.*\\?$).*", Pattern.CASE_INSENSITIVE)
                 .matcher(input).matches();
-        return pattern1 || pattern2;
+        boolean pattern3 = Pattern.compile("T'(?!.*\\?$).*", Pattern.CASE_INSENSITIVE)
+                .matcher(input).matches();
+        return pattern1 || pattern2 || pattern3;
     }
 
     /**
