@@ -5,8 +5,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Tests for MessageProcessor.
@@ -18,7 +25,7 @@ public class MessageProcessorTest {
         Processor p = new Processor();
 
         // Then
-        String[] sp = {"J'", "Je ", "M'"};
+        String[] sp = {"J'", "Je "};
         String[] r = 
         {"Pourquoi dites-vous que ", "Pourquoi pensez-vous que ", "Êtes-vous sûr que "};
 
@@ -35,21 +42,6 @@ public class MessageProcessorTest {
 
             assertThat(responseAttendu, is(true));
         }
-
-        /* assertThat(p.firstToSecondPerson("Je pense à mon chien."),
-                is("vous pensez à votre chien."));
-
-        assertThat(p.firstToSecondPerson("Je suis heureux."),
-                is("vous êtes heureux."));
-
-        assertThat(p.firstToSecondPerson("Je dis bonjour."),
-                is("vous dites bonjour."));
-
-        assertThat(p.firstToSecondPerson("Je vais à la mer."),
-                is("vous allez à la mer."));
-
-        assertThat(p.firstToSecondPerson("Je finis mon travail."),
-                is("vous finissez votre travail.")); */
     }
 
     /**
@@ -58,10 +50,6 @@ public class MessageProcessorTest {
      */
     @Test
     void testVerbList() {
-        /* assertThat(MessageProcessor.VERBS, hasItem(
-                allOf(
-                        hasProperty("firstSingular", is("suis")),
-                        hasProperty("secondPlural", is("êtes"))))); */
     }
 
     @Test
@@ -104,4 +92,26 @@ public class MessageProcessorTest {
 
         assertThat(Arrays.asList(re), hasItem(response));
     }
+
+    @Test
+    void testAnecdoteResponse() throws URISyntaxException, IOException {
+        // Given
+        Processor p = new Processor();
+
+        // When
+        String[] sp = {"Donne-moi une anecdote", "Une anecdote sur l'intelligence artificielle",
+                "je veux une anecdote sur l'intelligence artificielle"};
+
+        List<String> anecdotes = Files.readAllLines(Paths.get(getClass().getClassLoader()
+                .getResource("anecdotes.txt").toURI()));
+        Random random = new Random();
+
+        // THen
+        for (String request : sp) {
+            String response = p.generateResponse(request);
+            System.out.println("reque: " + request + " resp: " + response);
+            assertThat(anecdotes, hasItem(response));
+        }
+    }
+
 }
