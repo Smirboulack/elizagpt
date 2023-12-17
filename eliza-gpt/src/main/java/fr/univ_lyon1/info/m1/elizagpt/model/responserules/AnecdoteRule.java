@@ -31,10 +31,10 @@ public class AnecdoteRule implements IResponseRule {
                 .compile("Donne-moi une anecdote", Pattern.CASE_INSENSITIVE)
                 .matcher(input).find();
         boolean pattern2 = Pattern
-                .compile("Une anecdote sur l'intelligence artificiel", Pattern.CASE_INSENSITIVE)
+                .compile("Une anecdote sur l'intelligence artificielle", Pattern.CASE_INSENSITIVE)
                 .matcher(input).find();
         boolean pattern3 = Pattern
-                .compile("je veux une anecdote sur l'intelligence artificiel",
+                .compile("je veux une anecdote sur l'intelligence artificielle",
                         Pattern.CASE_INSENSITIVE)
                 .matcher(input).find();
 
