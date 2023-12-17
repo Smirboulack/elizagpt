@@ -5,7 +5,7 @@ import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 /**
  * Interface for a rule that generates a response.
  */
-public abstract interface IResponseRule {
+public interface IResponseRule {
     /**
      * Check if the rule applies to the input.
      *

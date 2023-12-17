@@ -1,9 +1,18 @@
 package fr.univ_lyon1.info.m1.elizagpt.model.message;
 
+/**.
+ * This class is used to create message which include only a text
+ */
 public class TxtMessage extends Message {
     private String text;
 
-    public TxtMessage(String id, String author, String date, final String txt) {
+    /**.
+     * Constructor for a CombinedMessage
+     * @param id the id of the message
+     * @param author the author of the message
+     * @param date the date of the message
+     */
+    public TxtMessage(final String id, final String author, final String date, final String txt) {
         super(id, author, date);
         this.text = txt;
     }
@@ -16,13 +25,17 @@ public class TxtMessage extends Message {
         this.text = txt;
     }
 
+    /**.
+     * Used to turn a TxtMessage to his String version
+     * @return the TxtMessage as a String
+     */
     public String toString() {
-        return this.getId() + " : " + this.getAuthor() + " : " + this.getDate() + " : " + this.getText();
+        return this.getId() + " : " + this.getAuthor() + " : "
+                + this.getDate() + " : " + this.getText();
     }
 
     @Override
     public String[] parseMessageString() {
-        String[] parts = this.toString().split(" : ", -1);
-        return parts;
+        return this.toString().split(" : ", -1);
     }
 }

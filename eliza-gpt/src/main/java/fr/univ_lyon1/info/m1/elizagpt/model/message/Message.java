@@ -4,18 +4,16 @@ package fr.univ_lyon1.info.m1.elizagpt.model.message;
  * Class representing a chat message.
  */
 public abstract class Message {
-    private String id;
+    private final String id;
     private String author;
     private String date;
 
     /**
-     * Constructor.
-     * 
-     * @param idm
-     * @param text
-     * @param author
-     * @param date
-     * @param style
+     * Constructor for a Message.
+     *
+     * @param id the id of the message
+     * @param author the author of the message
+     * @param date the date of the message
      */
     public Message(final String id, final String author, final String date) {
         this.id = id;
@@ -43,8 +41,16 @@ public abstract class Message {
         this.author = author;
     }
 
+    /**.
+     * Used to turn a Message to his String version
+     * @return the Message as a String
+     */
     public abstract String toString();
 
+    /**.
+     * Used to parse a message as an Array of String which contains every member data
+     * @return an Array of String
+     */
     public abstract String[] parseMessageString();
 
 }

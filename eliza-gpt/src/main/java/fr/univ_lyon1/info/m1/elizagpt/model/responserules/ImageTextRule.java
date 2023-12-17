@@ -3,6 +3,9 @@ package fr.univ_lyon1.info.m1.elizagpt.model.responserules;
 import fr.univ_lyon1.info.m1.elizagpt.model.Processor;
 import java.util.regex.Pattern;
 
+/**
+ * Interface for a rule that generates a response.
+ */
 public class ImageTextRule implements IResponseRule {
     /**
      * Check if the rule applies to the input.
@@ -13,9 +16,8 @@ public class ImageTextRule implements IResponseRule {
      */
     @Override
     public boolean appliesTo(final String input, final Processor processor) {
-        boolean pattern1 = Pattern.compile("text\\s*:\\s*.*\\s*image\\s*:\\s*.*", Pattern.CASE_INSENSITIVE)
+        return Pattern.compile("text\\s*:\\s*.*\\s*image\\s*:\\s*.*", Pattern.CASE_INSENSITIVE)
                 .matcher(input).matches();
-        return pattern1;
     }
 
     /**

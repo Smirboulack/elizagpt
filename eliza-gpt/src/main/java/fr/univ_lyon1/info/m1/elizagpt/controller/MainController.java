@@ -19,25 +19,30 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.VBox;
 
+/**.
+ * The MainController class coordinates interactions between views end the model.
+ * It manages every input and update views.
+ */
 public class MainController {
-    private Processor model;
-    private List<MainView> views;
-    private ObservableList<SearchStrategy> listeObservable = FXCollections.observableArrayList();
+    private final Processor model;
+    private final List<MainView> views;
+    private final ObservableList<SearchStrategy> listeObservable
+            = FXCollections.observableArrayList();
     private SearchStrategy currentSearchStrategy;
-    private List<Message> messagesSaved;
+    private final List<Message> messagesSaved;
 
     /**
      * Constructor.
      * 
-     * @param view
+     * @param view the list of views associated to this controller
      */
     public MainController(final List<MainView> view) {
         this.model = new Processor();
         this.views = view;
         this.chargerStrategies();
         this.messagesSaved = new ArrayList<>();
-        Message helloMessage = new TxtMessage("0", "eliza", DateUtils.addSeconds(new java.util.Date(), 0).toString(),
-                "Bonjour.");
+        Message helloMessage = new TxtMessage("0", "eliza",
+                DateUtils.addSeconds(new java.util.Date(), 0).toString(), "Bonjour.");
         this.messagesSaved.add(helloMessage);
         for (MainView mainView : views) {
             mainView.setController(this);
@@ -51,8 +56,10 @@ public class MainController {
      * Load all the search strategies.
      */
     public void chargerStrategies() {
-        Reflections reflections = new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
-        Set<Class<? extends SearchStrategy>> classes = reflections.getSubTypesOf(SearchStrategy.class);
+        Reflections reflections =
+                new Reflections("fr.univ_lyon1.info.m1.elizagpt.controller.searchStrategy");
+        Set<Class<? extends SearchStrategy>> classes
+                = reflections.getSubTypesOf(SearchStrategy.class);
 
         for (Class<? extends SearchStrategy> classe : classes) {
             try {
@@ -67,16 +74,25 @@ public class MainController {
     /**
      * Change the current search strategy.
      * 
-     * @param newValue
+     * @param newValue the new searchStrategy
      */
     public void changeSearchStrategy(final SearchStrategy newValue) {
         this.currentSearchStrategy = newValue;
     }
 
+    /**.
+     * Getter for listeObservable
+     * @return listeObservable
+     */
     public ObservableList<SearchStrategy> getListeObservable() {
         return listeObservable;
     }
 
+    /**.
+     * The process which executed after user inputs it message
+     * @param input the text message
+     * @param imagePath the path for the image (if an image is send)
+     */
     public void processUserInput(final String input, final File imagePath) {
         if (input.isEmpty() && imagePath == null) {
             return;
@@ -91,35 +107,57 @@ public class MainController {
         updateViews(message, response);
     }
 
-    private Message createMessage(String input, File imagePath) {
+    /**.
+     * Create the appropriate message according what is send
+     * @param input the text message
+     * @param imagePath the path for the image (if an image is send)
+     * @return the appropriate Message
+     */
+    private Message createMessage(final String input, final File imagePath) {
         String idu = Integer.toString(model.getRandom().nextInt());
         if (imagePath != null && !input.isEmpty()) {
-            return new CombinedMessage(idu, "user", DateUtils.addSeconds(new java.util.Date(), 0).toString(),
+            return new CombinedMessage(idu, "user",
+                    DateUtils.addSeconds(new java.util.Date(), 0).toString(),
                     model.normalize(input), imagePath.getAbsolutePath());
         } else if (imagePath != null) {
-            return new ImageMessage(idu, "user", DateUtils.addSeconds(new java.util.Date(), 0).toString(),
+            return new ImageMessage(idu, "user",
+                    DateUtils.addSeconds(new java.util.Date(), 0).toString(),
                     imagePath.getAbsolutePath());
         } else {
-            return new TxtMessage(idu, "user", DateUtils.addSeconds(new java.util.Date(), 0).toString(),
+            return new TxtMessage(idu, "user",
+                    DateUtils.addSeconds(new java.util.Date(), 0).toString(),
                     model.normalize(input));
         }
     }
 
+    /**.
+     * Create the appropriate response according to the user message
+     * @param input the text message
+     * @param imagePath the path for the image (if an image is send)
+     * @return the response Message
+     */
     private Message createResponse(final String input, final File imagePath) {
         String ide = Integer.toString(model.getRandom().nextInt());
         String responseText = model.generateResponse(model.normalize(input));
 
         if (imagePath != null && !input.isEmpty()) {
-            String concat = "text : " + model.normalize(input) + " image : " + imagePath.getAbsolutePath();
+            String concat = "text : " + model.normalize(input)
+                    + " image : " + imagePath.getAbsolutePath();
             responseText = model.generateResponse(concat);
         } else if (imagePath != null) {
             responseText = model.generateResponse(imagePath.getAbsolutePath());
         }
 
-        return new TxtMessage(ide, "eliza", DateUtils.addSeconds(new java.util.Date(), 0).toString(), responseText);
+        return new TxtMessage(ide, "eliza",
+                DateUtils.addSeconds(new java.util.Date(), 0).toString(), responseText);
     }
 
-    private void updateViews(Message message, Message response) {
+    /**.
+     * Updating every views after a message and it response
+     * @param message the message of the user
+     * @param response the response for the previous  message
+     */
+    private void updateViews(final Message message, final Message response) {
         for (MainView view : views) {
             if (message instanceof TxtMessage) {
                 view.displayTxtMessage(message.parseMessageString());
@@ -128,7 +166,8 @@ public class MainController {
                 view.displayImageMessage(message.parseMessageString());
                 view.displayTxtMessage(response.parseMessageString());
             } else if (message instanceof CombinedMessage) {
-                view.displayCombinedMessage(message.parseMessageString(), ((CombinedMessage) message).getImageUrl());
+                view.displayCombinedMessage(message.parseMessageString(),
+                        ((CombinedMessage) message).getImageUrl());
                 view.displayTxtMessage(response.parseMessageString());
             }
         }
@@ -137,12 +176,12 @@ public class MainController {
     /**
      * Process the receveid message.
      * 
-     * @param message
+     * @param messageId the id message to delete
      */
     public void deleteMessageViews(final String messageId) {
         for (MainView v : views) {
-            v.getDialog().getChildren().removeIf(node -> node instanceof VBox &&
-                    node.getId().equals(messageId));
+            v.getDialog().getChildren().removeIf(node -> node instanceof VBox
+                    && node.getId().equals(messageId));
         }
         messagesSaved.removeIf(m -> m.getId().equals(messageId));
     }
@@ -150,7 +189,7 @@ public class MainController {
     /**
      * Search a text in the chat.
      * 
-     * @param text
+     * @param text the text to search
      */
     public void searchText(final String text) {
         // saveChatState();
@@ -186,6 +225,10 @@ public class MainController {
         }
     }
 
+    /**.
+     * Switch from dark to white theme and vice versa
+     * @param theme the theme to switch
+     */
     public void changeViewsTheme(final String theme) {
         for (MainView view : views) {
             if (theme.equals("Light")) {

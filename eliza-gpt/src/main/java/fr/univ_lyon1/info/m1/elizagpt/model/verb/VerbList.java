@@ -59,9 +59,16 @@ public class VerbList {
         procesString = procesString.replaceAll("[Jj]e ", "vous ");
         procesString = procesString.replaceAll("([Jj]')", "vous ");
         procesString = procesString.replaceAll("([Mm]')", "vous ");
+        procesString = procesString.replaceAll("([Tt]')", "m'");
         return procesString;
     }
 
+    /**
+     * Normalize the given text by replacing pronouns.
+     *
+     * @param text The text to normalize.
+     * @return The normalized text.
+     */
     public String replacePronounsSecondToFirst(final String text) {
         String procesString = text;
         procesString = procesString.replaceAll("[Vv]ous ", "je ");
@@ -78,21 +85,35 @@ public class VerbList {
     public String verbsFirstToSecond(final String text) {
         String procesString = text;
         for (Verb verb : VerbList.getVerbs()) {
-            procesString = procesString.replaceAll("\\b" + verb.getFirstSingular() + "\\b", verb.getSecondPlural());
+            procesString = procesString.replaceAll("\\b"
+                    + verb.getFirstSingular() + "\\b", verb.getSecondPlural());
         }
         return procesString;
     }
 
+    /**
+     * Normalize the given text by the right conjugation.
+     *
+     * @param text The text to normalize.
+     * @return The normalized text.
+     */
     public String verbsSecondToFirst(final String text) {
         String procesString = text;
         String verbFirst = "";
         for (Verb verb : VerbList.getVerbs()) {
             verbFirst = convertVerb(verb.getSecondPlural());
-            procesString = procesString.replaceAll("\\b" + verb.getSecondPlural() + "\\b", verbFirst);
+            procesString = procesString.replaceAll("\\b"
+                    + verb.getSecondPlural() + "\\b", verbFirst);
         }
         return procesString;
     }
 
+    /**
+     * Convert a verb from second-person plural to first-person singular conjugation.
+     *
+     * @param verb The verb in second-person plural conjugation.
+     * @return The verb in first-person singular conjugation.
+     */
     public String convertVerb(final String verb) {
         return VerbList.getVerbs().stream()
                 .filter(v -> v.getSecondPlural().equals(verb))
@@ -109,7 +130,7 @@ public class VerbList {
      * @param text The text to process.
      * @return The text with possessive pronouns replaced.
      */
-    public String replacePossessives(String text) {
+    public String replacePossessives(final String text) {
         Pattern pattern = Pattern.compile("\\bme\\b|\\bma\\b|\\bmes\\b|\\bmoi\\b|\\bm'a\\b",
                 Pattern.CASE_INSENSITIVE);
         java.util.regex.Matcher matcher = pattern.matcher(text);

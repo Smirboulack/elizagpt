@@ -9,9 +9,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class MessageVisual {
+/**
+ * Represents the visual representation of a message, including text and image components.
+ */
+public final class MessageVisual {
     private static MessageVisual instance;
-
     private VBox messageVisual;
     private final Image trashImage;
     private ImageView imageView;
@@ -31,7 +33,12 @@ public class MessageVisual {
         this.controller = controller;
     }
 
-    // Méthode statique pour obtenir l'instance
+    /**
+     * Gets the singleton instance of MessageVisual associated with the provided MainController.
+     *
+     * @param controller The MainController associated with the instance.
+     * @return The MessageVisual instance.
+     */
     public static synchronized MessageVisual getInstance(final MainController controller) {
         if (instance == null) {
             instance = new MessageVisual(controller);
@@ -39,15 +46,30 @@ public class MessageVisual {
         return instance;
     }
 
+    /**
+     * Gets the VBox representing the visual display of a message.
+     *
+     * @return The message visual VBox.
+     */
     public VBox getMessageVisual() {
         return messageVisual;
     }
 
+    /**
+     * Sets the message visual VBox.
+     *
+     * @param messageVisual The VBox representing the visual display of a message.
+     */
     public void setMessageVisual(final VBox messageVisual) {
         this.messageVisual = messageVisual;
     }
 
-    public void createTxtMessageVisual(final String message[]) {
+    /**
+     * Creates and displays the visual representation of a text message in the dialog.
+     *
+     * @param message An array of String parts representing the components of the text message.
+     */
+    public void createTxtMessageVisual(final String[] message) {
 
         Label timeLabel = new Label(message[2]);
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
@@ -69,13 +91,12 @@ public class MessageVisual {
         trashView.setFitWidth(25);
         Button deleteButton = new Button();
         deleteButton.setGraphic(trashView);
-        deleteButton.setOnAction(event -> {
-            controller.deleteMessageViews(message[0]);
-        });
+        deleteButton.setOnAction(event -> controller.deleteMessageViews(message[0]));
 
         VBox messageContainer = new VBox(2);
         messageContainer.getChildren().add(timeLabel);
-        messageContainer.setAlignment(message[1].equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        messageContainer.setAlignment(message[1].equals("user")
+                ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
         HBox container = new HBox(5);
         messageContainer.setId(message[0]);
@@ -88,7 +109,12 @@ public class MessageVisual {
 
     }
 
-    public void createImageMessageVisual(final String message[]) {
+    /**
+     * Creates and displays the visual representation of an image message in the dialog.
+     *
+     * @param message An array of String parts representing the components of the image message.
+     */
+    public void createImageMessageVisual(final String[] message) {
         Label timeLabel = new Label(message[2]);
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
 
@@ -113,13 +139,12 @@ public class MessageVisual {
         trashView.setFitWidth(25);
         Button deleteButton = new Button();
         deleteButton.setGraphic(trashView);
-        deleteButton.setOnAction(event -> {
-            controller.deleteMessageViews(message[0]);
-        });
+        deleteButton.setOnAction(event -> controller.deleteMessageViews(message[0]));
 
         VBox messageContainer = new VBox(2);
         messageContainer.getChildren().add(timeLabel);
-        messageContainer.setAlignment(message[1].equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        messageContainer.setAlignment(message[1].equals("user")
+                ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
         HBox container = new HBox(5);
         messageContainer.setId(message[0]);
@@ -131,7 +156,14 @@ public class MessageVisual {
         messageVisual = messageContainer;
     }
 
-    public void createCombinedMessageVisual(final String message[], final String messageUrl) {
+    /**
+     * Creates and displays the visual representation of a combined message
+     * with text and image in the dialog.
+     *
+     * @param message An array of String parts representing the components of the combined message.
+     * @param messageUrl The URL of the image associated with the combined message.
+     */
+    public void createCombinedMessageVisual(final String[] message, final String messageUrl) {
         Label timeLabel = new Label(message[2]);
         timeLabel.setStyle("-fx-text-fill: grey; -fx-font-size: 10px;");
 
@@ -159,13 +191,12 @@ public class MessageVisual {
         trashView.setFitWidth(25);
         Button deleteButton = new Button();
         deleteButton.setGraphic(trashView);
-        deleteButton.setOnAction(event -> {
-            controller.deleteMessageViews(message[0]);
-        });
+        deleteButton.setOnAction(event -> controller.deleteMessageViews(message[0]));
 
         VBox messageContainer = new VBox(2);
         messageContainer.getChildren().add(timeLabel);
-        messageContainer.setAlignment(message[1].equals("user") ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        messageContainer.setAlignment(message[1].equals("user")
+                ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
         HBox container = new HBox(5);
         messageContainer.setId(message[0]);

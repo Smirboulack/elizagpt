@@ -60,7 +60,8 @@ public class Processor {
                     String fullClassName = "fr.univ_lyon1.info.m1.elizagpt.model.responserules."
                             + className.trim();
                     Class<?> clazz = Class.forName(fullClassName);
-                    IResponseRule rule = (IResponseRule) clazz.getDeclaredConstructor().newInstance();
+                    IResponseRule rule =
+                            (IResponseRule) clazz.getDeclaredConstructor().newInstance();
                     rules.add(rule);
                 } catch (ClassNotFoundException e) {
                     System.err.println("La classe " + className.trim() + " n'a pas été trouvée.");
@@ -107,6 +108,13 @@ public class Processor {
         return processedText;
     }
 
+    /**
+     * Converts the given text from second-person to first-person,
+     * including pronouns, verbs, and possessive pronouns.
+     *
+     * @param text The text to be converted.
+     * @return The processed text with second-person replaced by first-person.
+     */
     public String secondToFirstPerson(final String text) throws CsvValidationException {
         String processedText = text;
 

@@ -32,7 +32,7 @@ public class MainView {
     private Label searchTextLabel = null;
     private ComboBox<SearchStrategy> strategySelect;
     private MainController controller;
-    private ImageView imagePreview;
+    private final ImageView imagePreview;
     private File selectedImageFile;
     Button themeToggleButton;
     ImageView toggleImageView;
@@ -82,23 +82,43 @@ public class MainView {
 
     }
 
+    /**
+     * Sets the message visual.
+     */
     public void setMessageVisual() {
         this.messageVisual = MessageVisual.getInstance(controller);
     }
 
-    public void displayTxtMessage(final String parts[]) {
+    /**
+     * Displays a text message visual in the dialog using the provided message parts.
+     *
+     * @param parts An array of String parts representing the components of the text message.
+     */
+    public void displayTxtMessage(final String[] parts) {
         MessageVisual messageVisual = MessageVisual.getInstance(controller);
         messageVisual.createTxtMessageVisual(parts);
         this.dialog.getChildren().add(messageVisual.getMessageVisual());
     }
 
-    public void displayImageMessage(final String parts[]) {
+    /**
+     * Displays an image message visual in the dialog using the provided message parts.
+     *
+     * @param parts An array of String parts representing the components of the image message.
+     */
+    public void displayImageMessage(final String[] parts) {
         MessageVisual messageVisual = MessageVisual.getInstance(controller);
         messageVisual.createImageMessageVisual(parts);
         this.dialog.getChildren().add(messageVisual.getMessageVisual());
     }
 
-    public void displayCombinedMessage(final String parts[], final String messageUrl) {
+    /**
+     * Displays a combined message visual.
+     *
+     * @param parts       An array of String parts representing the components
+     *                    of the combined message.
+     * @param messageUrl  The URL of the image associated with the combined message.
+     */
+    public void displayCombinedMessage(final String[] parts, final String messageUrl) {
         MessageVisual messageVisual = MessageVisual.getInstance(controller);
         messageVisual.createCombinedMessageVisual(parts, messageUrl);
         this.dialog.getChildren().add(messageVisual.getMessageVisual());
@@ -111,9 +131,7 @@ public class MainView {
         final HBox firstLine = new HBox(10);
 
         searchText = new TextField();
-        searchText.setOnAction(e -> {
-            controller.searchText(searchText.getText());
-        });
+        searchText.setOnAction(e -> controller.searchText(searchText.getText()));
 
         // Configuration du ComboBox
         strategySelect.getSelectionModel()
@@ -127,14 +145,10 @@ public class MainView {
         firstLine.getChildren().addAll(searchText, strategySelect);
 
         final Button send = new Button("Search");
-        send.setOnAction(e -> {
-            controller.searchText(searchText.getText());
-        });
+        send.setOnAction(e -> controller.searchText(searchText.getText()));
         searchTextLabel = new Label();
         final Button undo = new Button("Undo search");
-        undo.setOnAction(e -> {
-            controller.undoSearch();
-        });
+        undo.setOnAction(e -> controller.undoSearch());
         final HBox secondLine = new HBox(10);
         secondLine.setAlignment(Pos.BASELINE_LEFT);
         secondLine.getChildren().addAll(send, searchTextLabel, undo);
@@ -144,6 +158,14 @@ public class MainView {
         return input;
     }
 
+    /**
+     * Initializes the ComboBox with the list of SearchStrategy items.
+     * Associates the ComboBox with the provided ObservableList, sets up the converter
+     * for displaying strategy names, and selects the first strategy by default.
+     *
+     * @param listeObservable The ObservableList containing
+     *                        SearchStrategy items to populate the ComboBox.
+     */
     public void initializeComboBox(final ObservableList<SearchStrategy> listeObservable) {
         this.strategySelect.setItems(listeObservable);
         this.strategySelect.setConverter(new StringConverter<SearchStrategy>() {
@@ -240,12 +262,13 @@ public class MainView {
             }
         });
 
-        // Ajouter le bouton en haut à droite
-        HBox topRightBox = new HBox(themeToggleButton);
-
-        return topRightBox;
+        // Ajouter et retourne le bouton en haut à droite
+        return new HBox(themeToggleButton);
     }
 
+    /**.
+     * Used to modify items from dark theme to white theme
+     */
     public void whiteTheme() {
         this.themeToggleButton.setText("Dark");
         this.toggleImageView.setImage(new Image("file:src/main/resources/moon.png"));
@@ -253,6 +276,9 @@ public class MainView {
         this.dialog.setStyle(null);
     }
 
+    /**.
+     * Used to modify items from white theme to dark theme
+     */
     public void darkTheme() {
         this.themeToggleButton.setText("Light");
         this.toggleImageView.setImage(new Image("file:src/main/resources/sun.png"));
@@ -281,7 +307,7 @@ public class MainView {
     /**
      * Return the search text label.
      * 
-     * @return
+     * @return searchTextLabel
      */
     public Label getSearchTextLabel() {
         return searchTextLabel;
@@ -322,5 +348,25 @@ public class MainView {
 
     public void setDialog(final VBox dialog) {
         this.dialog = dialog;
+    }
+
+    public VBox getRoot() {
+        return root;
+    }
+
+    public Button getThemeToggleButton() {
+        return themeToggleButton;
+    }
+
+    public void setThemeToggleButton(final Button themeToggleButton) {
+        this.themeToggleButton = themeToggleButton;
+    }
+
+    public ImageView getToggleImageView() {
+        return toggleImageView;
+    }
+
+    public void setToggleImageView(final ImageView toggleImageView) {
+        this.toggleImageView = toggleImageView;
     }
 }
